@@ -8,6 +8,9 @@ entrega, os produtos e os ingredientes. Funciona no navegador do celular ou do c
 
 ## O que o sistema faz
 
+- **Painel**: pedidos de hoje, valor a receber, produção do dia, pedidos da semana, agenda e alertas de validade e estoque.
+- **Pedidos**: cliente (cadastrado ou não), WhatsApp, entrega ou retirada com endereço, data e horário, itens escolhidos do cadastro de produtos ou escritos à mão (com quantidade, preço e observação), descrição longa, taxa de entrega, desconto e total automático. Etapas (novo → confirmado → em produção → pronto → entregue, ou cancelado) e pagamento (pago ou a receber) mudam com um toque. Busca por nome, WhatsApp, item ou número, filtros por dia, entrega/retirada, pagamento e etapa, e botão que manda o resumo do pedido no WhatsApp do cliente.
+- **Produção do dia**: soma, produto por produto, tudo o que precisa ser feito nos pedidos do dia (cancelados ficam de fora), com opção de contar só o que falta entregar e de imprimir.
 - **Agenda**: compromissos com data, horário e descrição longa, agrupados por dia, com filtro por data e botão "Hoje".
 - **Clientes**: nome, WhatsApp (obrigatório), telefone fixo e e-mail opcionais, busca por nome ou número e botão que abre a conversa no WhatsApp.
 - **Endereços**: cadastrados junto com o cliente (já vem Arapiraca – AL). Cliente sem endereço aparece como "Retira na loja".
@@ -61,3 +64,35 @@ Os documentos do projeto acadêmico estão em [`docs/academico`](docs/academico)
 
 Adaptação para a Homemade Confeitaria: nova identidade visual, textos em português,
 atualização para Ruby 3.3 / Rails 7.2, login obrigatório e correções de bugs.
+
+A parte de pedidos usa ideias do projeto [Alon's Bakery OMS](https://github.com/Artumax9/alons-bakery-oms)
+(© 2026 Arturo Paredes, licença MIT): preço de cada item copiado no momento do pedido, cálculo do total
+num objeto separado e etapas do pedido controladas por uma tabela de transições permitidas. O código foi
+reescrito em português para este sistema; o aviso de licença MIT original segue abaixo.
+
+<details><summary>Licença MIT – Alon's Bakery OMS</summary>
+
+```
+MIT License
+
+Copyright (c) 2026 Arturo Paredes
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+</details>

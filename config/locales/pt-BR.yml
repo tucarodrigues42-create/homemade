@@ -7,6 +7,8 @@ pt-BR:
       produto: { one: "Produto", other: "Produtos" }
       ingrediente: { one: "Ingrediente", other: "Ingredientes" }
       usuario: { one: "Usuário", other: "Usuários" }
+      pedido: { one: "Pedido", other: "Pedidos" }
+      pedido_item: { one: "Item do pedido", other: "Itens do pedido" }
     attributes:
       agenda:
         mensagem: "Descrição"
@@ -46,3 +48,29 @@ pt-BR:
         password: "Senha"
         password_confirmation: "Confirme a senha"
         adm: "Administrador"
+      pedido:
+        cliente: "Cliente cadastrado"
+        nome_cliente: "Nome do cliente"
+        whatsapp: "WhatsApp"
+        tipo_entrega: "Entrega ou retirada"
+        endereco_entrega: "Endereço de entrega"
+        data: "Data"
+        horario: "Horário"
+        status: "Etapa"
+        pagamento: "Pagamento"
+        forma_pagamento: "Forma de pagamento"
+        taxa_entrega: "Taxa de entrega (R$)"
+        desconto: "Desconto (R$)"
+        total: "Total"
+        descricao: "Descrição do pedido"
+        itens: "Itens"
+      pedido_item:
+        produto: "Produto"
+        nome: "Item"
+        quantidade: "Quantidade"
+        preco_unitario: "Preço unitário (R$)"
+        observacao: "Observação"
+      pedido/itens:
+        nome: "Item"
+        quantidade: "Quantidade do item"
+        preco_unitario: "Preço do item"

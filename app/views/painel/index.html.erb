@@ -4,8 +4,9 @@
   <p class="boas-vindas-data"><%= dia_da_semana(@hoje) %></p>
   <h1><%= saudacao %>!</h1>
   <p class="discreto">
-    <% if @agenda_hoje.any? %>
-      Você tem <strong><%= pluralize(@agenda_hoje.size, "compromisso", plural: "compromissos") %></strong> para hoje.
+    <% if @pedidos_hoje.any? || @agenda_hoje.any? %>
+      Hoje: <strong><%= pluralize(@pedidos_hoje.size, "pedido", plural: "pedidos") %></strong>
+      e <strong><%= pluralize(@agenda_hoje.size, "compromisso", plural: "compromissos") %></strong>.
     <% else %>
       Nada marcado para hoje até agora.
     <% end %>
@@ -13,21 +14,21 @@
 </section>
 
 <div class="atalhos">
-  <%= link_to new_agenda_path(dia: @hoje), class: "atalho" do %><%= icone(:mais_item) %><span>Compromisso</span><% end %>
+  <%= link_to new_pedido_path(dia: @hoje), class: "atalho" do %><%= icone(:mais_item) %><span>Pedido</span><% end %>
   <%= link_to new_cliente_path, class: "atalho" do %><%= icone(:mais_item) %><span>Cliente</span><% end %>
-  <%= link_to new_produto_path, class: "atalho" do %><%= icone(:mais_item) %><span>Produto</span><% end %>
+  <%= link_to new_agenda_path(dia: @hoje), class: "atalho" do %><%= icone(:mais_item) %><span>Compromisso</span><% end %>
 </div>
 
 <section class="numeros" aria-label="Resumo">
-  <%= link_to agendas_path(dia: @hoje), class: "numero numero-destaque" do %>
-    <span class="numero-rotulo"><%= icone(:agenda) %> Hoje</span>
-    <strong class="numero-valor"><%= @agenda_hoje.size %></strong>
-    <span class="numero-detalhe">compromissos</span>
+  <%= link_to pedidos_path(periodo: "dia", dia: @hoje), class: "numero numero-destaque" do %>
+    <span class="numero-rotulo"><%= icone(:pedidos) %> Pedidos hoje</span>
+    <strong class="numero-valor"><%= @pedidos_hoje.size %></strong>
+    <span class="numero-detalhe"><%= @producao_hoje.total_unidades %> unidades para produzir</span>
   <% end %>
-  <%= link_to agendas_path, class: "numero" do %>
-    <span class="numero-rotulo"><%= icone(:agenda) %> Próximos 7 dias</span>
-    <strong class="numero-valor"><%= @proximos.size %></strong>
-    <span class="numero-detalhe"><%= @sem_data.positive? ? "+ #{@sem_data} sem data" : "compromissos" %></span>
+  <%= link_to pedidos_path(periodo: "proximos", pagamento: "pendente"), class: "numero" do %>
+    <span class="numero-rotulo"><%= icone(:pedidos) %> A receber</span>
+    <strong class="numero-valor numero-valor-dinheiro"><%= reais(@a_receber) %></strong>
+    <span class="numero-detalhe"><%= @pedidos_semana %> pedidos nos próximos 7 dias</span>
   <% end %>
   <%= link_to clientes_path, class: "numero" do %>
     <span class="numero-rotulo"><%= icone(:clientes) %> Clientes</span>
@@ -42,12 +43,12 @@
 </section>
 
 <section class="bloco" aria-labelledby="titulo-semana">
-  <h2 id="titulo-semana" class="bloco-titulo">Sua semana</h2>
+  <h2 id="titulo-semana" class="bloco-titulo">Pedidos da semana</h2>
   <ol class="semana">
     <% @semana.each do |dia, total| %>
       <li>
-        <%= link_to agendas_path(dia: dia), class: ["semana-dia", ("hoje" if dia == @hoje), ("vazio" if total.zero?)].compact.join(" "),
-                    "aria-label": "#{l(dia, format: '%A, %d/%m')}: #{pluralize(total, 'compromisso', plural: 'compromissos')}" do %>
+        <%= link_to pedidos_path(periodo: "dia", dia: dia), class: ["semana-dia", ("hoje" if dia == @hoje), ("vazio" if total.zero?)].compact.join(" "),
+                    "aria-label": "#{l(dia, format: '%A, %d/%m')}: #{pluralize(total, 'pedido', plural: 'pedidos')}" do %>
           <span class="semana-nome"><%= dia == @hoje ? "Hoje" : l(dia, format: "%a").delete(".").capitalize %></span>
           <span class="semana-numero"><%= dia.day %></span>
           <span class="semana-total"><%= total.zero? ? "–" : total %></span>
@@ -56,6 +57,50 @@
     <% end %>
   </ol>
 </section>
+
+<div class="colunas">
+  <section class="bloco" aria-labelledby="titulo-producao">
+    <div class="bloco-cabecalho">
+      <h2 id="titulo-producao" class="bloco-titulo">Produção de hoje</h2>
+      <%= link_to "Ver tudo", producao_path(dia: @hoje), class: "link-discreto" %>
+    </div>
+    <% if @producao_hoje.linhas.empty? %>
+      <div class="vazio vazio-pequeno">
+        <p>Nenhum item para produzir hoje.</p>
+        <%= link_to "+ Novo pedido", new_pedido_path(dia: @hoje), class: "botao" %>
+      </div>
+    <% else %>
+      <ul class="producao-mini">
+        <% @producao_hoje.linhas.first(6).each do |linha| %>
+          <li><strong><%= linha.quantidade %></strong><span><%= linha.nome %></span></li>
+        <% end %>
+      </ul>
+      <% if @producao_hoje.linhas.size > 6 %><p class="discreto mais-itens">e mais <%= @producao_hoje.linhas.size - 6 %> produtos…</p><% end %>
+    <% end %>
+  </section>
+
+  <section class="bloco" aria-labelledby="titulo-pedidos-hoje">
+    <div class="bloco-cabecalho">
+      <h2 id="titulo-pedidos-hoje" class="bloco-titulo">Pedidos de hoje</h2>
+      <%= link_to "Ver pedidos", pedidos_path(periodo: "dia", dia: @hoje), class: "link-discreto" %>
+    </div>
+    <% if @pedidos_hoje.empty? %>
+      <div class="vazio vazio-pequeno"><p>Nenhum pedido para hoje.</p></div>
+    <% else %>
+      <ul class="linha-tempo">
+        <% @pedidos_hoje.first(6).each do |pedido| %>
+          <li>
+            <%= link_to pedido, class: "linha-tempo-item linha-tempo-#{pedido.status}" do %>
+              <span class="linha-tempo-hora"><%= hora_br(pedido.horario) || "—" %><small><%= pedido.entrega? ? "Entrega" : "Retirada" %></small></span>
+              <span class="linha-tempo-texto"><strong><%= pedido.nome_cliente %></strong> · <%= pedido.status_nome %><br><%= resumo_itens(pedido, limite: 3).presence || truncate(pedido.descricao, length: 80) %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      <% if @pedidos_hoje.size > 6 %><p class="discreto mais-itens">e mais <%= @pedidos_hoje.size - 6 %>…</p><% end %>
+    <% end %>
+  </section>
+</div>
 
 <div class="colunas">
   <section class="bloco" aria-labelledby="titulo-hoje">

@@ -2,6 +2,13 @@ Rails.application.routes.draw do
   root "painel#index"
   get "/mais", to: "painel#mais", as: :mais
 
+  get "/producao", to: "pedidos#producao", as: :producao
+  resources :pedidos do
+    member do
+      patch :status
+      patch :pagamento
+    end
+  end
   resources :agendas
   resources :clientes
   resources :enderecos

@@ -1,5 +1,6 @@
 class Cliente < ApplicationRecord
   belongs_to :endereco, optional: true
+  has_many :pedidos, dependent: :nullify
   # Cidade e estado já vêm preenchidos (Arapiraca – AL); sem rua, número e bairro o
   # cliente é tratado como "retira na loja" e nenhum endereço é criado.
   accepts_nested_attributes_for :endereco, reject_if: :sem_endereco?

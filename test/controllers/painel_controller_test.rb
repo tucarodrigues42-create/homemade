@@ -6,7 +6,8 @@ class PainelControllerTest < ActionDispatch::IntegrationTest
   test "início mostra o painel com os números do dia" do
     get root_url
     assert_response :success
-    assert_select ".numero-destaque .numero-valor", "1"
+    assert_select ".numero-destaque .numero-valor", "2" # pedidos de hoje, sem o cancelado
+    assert_select ".producao-mini li", 3
     assert_select ".numero", 4
     assert_select ".semana li", 7
     assert_match "panetones", response.body
@@ -35,6 +36,8 @@ class PainelControllerTest < ActionDispatch::IntegrationTest
     get mais_url
     assert_response :success
     assert_select "a[href='#{enderecos_path}']"
+    assert_select "a[href='#{agendas_path}']"
+    assert_select "a[href='#{produtos_path}']"
     assert_select "a[href='#{ingredientes_path}']"
     assert_select "form[action='#{sessions_path}']"
   end

@@ -28,6 +28,8 @@
         <% if logged_in? %>
           <nav class="menu-topo" aria-label="Menu principal">
             <%= item_menu "Início", root_path, "painel", :inicio %>
+            <%= item_menu "Pedidos", pedidos_path(periodo: "proximos"), "pedidos", :pedidos %>
+            <%= item_menu "Produção", producao_path, "producao", :producao %>
             <%= item_menu "Agenda", agendas_path, "agendas", :agenda %>
             <%= item_menu "Clientes", clientes_path, "clientes", :clientes %>
             <%= item_menu "Produtos", produtos_path, "produtos", :produtos %>
@@ -55,9 +57,9 @@
     <% if logged_in? %>
       <nav class="menu-baixo" aria-label="Menu principal">
         <%= item_menu "Início", root_path, "painel", :inicio, classe: "aba" %>
-        <%= item_menu "Agenda", agendas_path, "agendas", :agenda, classe: "aba" %>
+        <%= item_menu "Pedidos", pedidos_path(periodo: "proximos"), "pedidos", :pedidos, classe: "aba" %>
+        <%= item_menu "Produção", producao_path, "producao", :producao, classe: "aba" %>
         <%= item_menu "Clientes", clientes_path, "clientes", :clientes, classe: "aba" %>
-        <%= item_menu "Produtos", produtos_path, "produtos", :produtos, classe: "aba" %>
         <%= item_menu "Mais", mais_path, "mais", :mais, classe: "aba" %>
       </nav>
     <% end %>

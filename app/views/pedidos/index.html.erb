@@ -1,0 +1,50 @@
+<% content_for :title, "Pedidos" %>
+<%= render "shared/cabecalho", titulo: "Pedidos", botao_texto: "+ Novo pedido", botao_caminho: new_pedido_path(dia: @dia_exibido) %>
+
+<nav class="abas-periodo" aria-label="Período">
+  <%= link_to "Hoje", pedidos_path(periodo: "dia", dia: Date.current), class: ("ativo" if @periodo == "dia" && @dia_exibido == Date.current) %>
+  <%= link_to "Próximos", pedidos_path(periodo: "proximos"), class: ("ativo" if @periodo == "proximos") %>
+  <%= link_to "Anteriores", pedidos_path(periodo: "anteriores"), class: ("ativo" if @periodo == "anteriores") %>
+  <%= link_to "Todos", pedidos_path(periodo: "todos"), class: ("ativo" if @periodo == "todos") %>
+</nav>
+
+<%= form_with url: pedidos_path, method: :get, local: true, class: "filtros-pedido" do |f| %>
+  <div class="filtros-linha">
+    <%= f.label :q, "Buscar", class: "visualmente-oculto" %>
+    <%= f.search_field :q, value: params[:q], placeholder: "Buscar por nome, WhatsApp, item ou nº" %>
+    <%= f.label :dia, "Dia", class: "visualmente-oculto" %>
+    <%= f.date_field :dia, value: @dia, "aria-label": "Escolher um dia" %>
+  </div>
+  <div class="filtros-linha">
+    <%= f.select :tipo, options_for_select([["Entrega e retirada", ""], ["Só entrega", "entrega"], ["Só retirada", "retirada"]], params[:tipo]), {}, "aria-label": "Entrega ou retirada" %>
+    <%= f.select :pagamento, options_for_select([["Pago e a receber", ""], ["Só a receber", "pendente"], ["Só pagos", "pago"]], params[:pagamento]), {}, "aria-label": "Pagamento" %>
+    <%= f.select :status, options_for_select([["Todas as etapas", ""], ["Em aberto", "abertos"]] + Pedido::STATUS.map { |k, v| [v, k] }, params[:status]), {}, "aria-label": "Etapa" %>
+  </div>
+  <%= hidden_field_tag :periodo, (@dia ? "dia" : @periodo) %>
+  <div class="filtros-linha">
+    <%= f.submit "Filtrar", class: "botao botao-principal", name: nil %>
+    <% if @filtros.except(:periodo).values.any?(&:present?) %>
+      <%= link_to "Limpar filtros", pedidos_path(periodo: @periodo == "dia" ? "proximos" : @periodo), class: "botao" %>
+    <% end %>
+    <%= link_to producao_path(dia: @dia_exibido || Date.current), class: "botao" do %><%= icone(:producao) %>&nbsp;Produção do dia<% end %>
+  </div>
+<% end %>
+
+<p class="resumo-lista">
+  <strong><%= pluralize(@pedidos.size, "pedido", plural: "pedidos") %></strong>
+  <% if @dia_exibido %> em <%= l(@dia_exibido, format: "%d/%m") %><% end %>
+  · total <%= reais(@total_valor) %>
+  <% if @a_receber.positive? %> · <span class="a-receber">a receber <%= reais(@a_receber) %></span><% end %>
+</p>
+
+<% if @pedidos.empty? %>
+  <div class="vazio vazio-pequeno">
+    <p>Nenhum pedido encontrado.</p>
+    <%= link_to "+ Novo pedido", new_pedido_path(dia: @dia_exibido), class: "botao" %>
+  </div>
+<% else %>
+  <% @pedidos.group_by(&:data).each do |data, pedidos| %>
+    <h2 class="dia"><%= dia_da_semana(data) %> <small class="discreto">· <%= pluralize(pedidos.size, "pedido", plural: "pedidos") %></small></h2>
+    <ul class="lista"><%= render partial: "pedidos/pedido", collection: pedidos %></ul>
+  <% end %>
+<% end %>

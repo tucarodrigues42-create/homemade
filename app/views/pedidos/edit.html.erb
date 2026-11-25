@@ -1,0 +1,3 @@
+<% content_for :title, "Editar pedido #{@pedido.numero}" %>
+<%= render "shared/cabecalho", titulo: "Editar pedido #{@pedido.numero}" %>
+<%= render "form", pedido: @pedido %>

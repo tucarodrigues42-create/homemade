@@ -1,0 +1,69 @@
+<% content_for :title, "Produção do dia" %>
+<div class="cabecalho">
+  <h1>Produção do dia</h1>
+  <button type="button" class="botao" onclick="window.print()">Imprimir</button>
+</div>
+
+<nav class="navegar-dia" aria-label="Escolher dia">
+  <%= link_to "‹", producao_path(dia: @dia - 1, entregues: params[:entregues]), class: "botao", "aria-label": "Dia anterior" %>
+  <%= form_with url: producao_path, method: :get, local: true, class: "navegar-dia-form" do |f| %>
+    <%= f.date_field :dia, value: @dia, "aria-label": "Dia", onchange: "this.form.submit()" %>
+    <%= hidden_field_tag :entregues, params[:entregues] if params[:entregues] %>
+  <% end %>
+  <%= link_to "›", producao_path(dia: @dia + 1, entregues: params[:entregues]), class: "botao", "aria-label": "Próximo dia" %>
+</nav>
+<p class="boas-vindas-data"><%= dia_da_semana(@dia) %><%= " · hoje" if @dia == Date.current %></p>
+
+<section class="numeros numeros-3" aria-label="Resumo da produção">
+  <div class="numero numero-destaque">
+    <span class="numero-rotulo">Unidades</span>
+    <strong class="numero-valor"><%= @producao.total_unidades %></strong>
+    <span class="numero-detalhe">para produzir</span>
+  </div>
+  <div class="numero">
+    <span class="numero-rotulo">Produtos</span>
+    <strong class="numero-valor"><%= @producao.linhas.size %></strong>
+    <span class="numero-detalhe">diferentes</span>
+  </div>
+  <%= link_to pedidos_path(periodo: "dia", dia: @dia), class: "numero" do %>
+    <span class="numero-rotulo">Pedidos</span>
+    <strong class="numero-valor"><%= @pedidos.size %></strong>
+    <span class="numero-detalhe"><%= pluralize(@pedidos.count(&:entrega?), "entrega", plural: "entregas") %> · <%= pluralize(@pedidos.count { |p| !p.entrega? }, "retirada", plural: "retiradas") %></span>
+  <% end %>
+</section>
+
+<p class="discreto">
+  <% if @incluir_entregues %>
+    Contando todos os pedidos do dia, menos os cancelados.
+    <%= link_to "Mostrar só o que falta entregar", producao_path(dia: @dia, entregues: 0) %>
+  <% else %>
+    Contando só o que ainda não foi entregue.
+    <%= link_to "Contar o dia inteiro", producao_path(dia: @dia) %>
+  <% end %>
+</p>
+
+<% if @producao.linhas.empty? %>
+  <div class="vazio vazio-pequeno">
+    <p>Nenhum item para produzir neste dia.</p>
+    <%= link_to "+ Novo pedido", new_pedido_path(dia: @dia), class: "botao" %>
+  </div>
+<% else %>
+  <table class="tabela-producao">
+    <thead><tr><th scope="col">Produto</th><th scope="col" class="num">Qtd.</th><th scope="col" class="num">Pedidos</th></tr></thead>
+    <tbody>
+      <% @producao.linhas.each do |linha| %>
+        <tr>
+          <td><%= linha.nome %><% unless linha.produto_id %> <small class="discreto">(fora do cadastro)</small><% end %></td>
+          <td class="num"><strong><%= linha.quantidade %></strong></td>
+          <td class="num"><%= linha.pedidos %></td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot><tr><th scope="row">Total</th><td class="num"><strong><%= @producao.total_unidades %></strong></td><td class="num"><%= @pedidos.size %></td></tr></tfoot>
+  </table>
+<% end %>
+
+<% if @pedidos.any? %>
+  <h2 class="bloco-titulo bloco-espaco">Pedidos deste dia</h2>
+  <ul class="lista"><%= render partial: "pedidos/pedido", collection: @pedidos %></ul>
+<% end %>

@@ -483,3 +483,142 @@ input:focus, select:focus, textarea:focus { border-color: var(--marca); outline:
   .atalhos { display: grid; grid-template-columns: repeat(3, 1fr); overflow: visible; }
   .atalho { justify-content: center; padding: 8px 6px; gap: 4px; font-size: .9rem; }
 }
+
+/* ---------- Pedidos ---------- */
+.botao-pequeno { min-height: 36px; padding: 4px 12px; font-size: .88rem; }
+
+.abas-periodo { display: flex; gap: 4px; padding: 4px; background: var(--marca-clara); border-radius: 12px; margin-bottom: 12px; overflow-x: auto; }
+.abas-periodo a {
+  flex: 1 0 auto;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 9px;
+  color: var(--marca-escura);
+  font-weight: 700;
+  font-size: .95rem;
+  text-decoration: none;
+}
+.abas-periodo a.ativo { background: #fff; box-shadow: var(--sombra); }
+
+.filtros-pedido { display: grid; gap: 8px; margin-bottom: 12px; }
+.filtros-linha { display: flex; flex-wrap: wrap; gap: 8px; }
+.filtros-linha > input[type="search"] { flex: 3 1 220px; width: auto; }
+.filtros-linha > input[type="date"] { flex: 1 1 150px; width: auto; }
+.filtros-linha > select { flex: 1 1 150px; width: auto; }
+.filtros-linha .botao .icone { width: 18px; height: 18px; }
+
+.resumo-lista { margin: 4px 0 8px; color: var(--texto-suave); }
+.resumo-lista strong { color: var(--texto); }
+.a-receber { color: #8A5300; font-weight: 700; }
+.dia small { font-weight: 600; }
+
+.pedido { padding: 12px 14px; display: grid; gap: 10px; border-left: 4px solid var(--marca); }
+.pedido-cancelado { opacity: .6; border-left-color: var(--borda); }
+.pedido-topo { display: flex; gap: 12px; align-items: flex-start; }
+.pedido-hora { flex: 0 0 52px; display: flex; flex-direction: column; font-weight: 700; color: var(--marca-escura); font-variant-numeric: tabular-nums; line-height: 1.25; }
+.pedido-hora small { color: var(--texto-suave); font-weight: 600; font-size: .8rem; }
+.pedido-quem { flex: 1; min-width: 0; }
+.pedido-nome { color: var(--texto); font-weight: 700; font-size: 1.05rem; text-decoration: none; }
+.pedido-nome small { color: var(--texto-suave); font-weight: 600; }
+.pedido-nome:hover { color: var(--marca-escura); text-decoration: underline; }
+.pedido-itens { margin: 2px 0 0; color: var(--texto-suave); font-size: .95rem; overflow-wrap: anywhere; }
+.pedido-total { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pedido-rodape { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.pedido-acoes { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.selos { display: flex; flex-wrap: wrap; gap: 6px; }
+.selos-grandes { margin-bottom: 12px; }
+.selos-grandes .selo { font-size: .9rem; padding: 3px 12px; }
+.selo { display: inline-block; padding: 1px 10px; border-radius: 999px; font-size: .8rem; font-weight: 700; background: var(--fundo); color: var(--texto-suave); border: 1px solid var(--borda); }
+.selo-novo { background: #E8F0FE; color: #1F4E9A; border-color: #C9DAF8; }
+.selo-confirmado { background: #EDE7F6; color: #5B3B99; border-color: #D9CCF0; }
+.selo-em_producao { background: #FFF4E0; color: #8A5300; border-color: #F5DDB0; }
+.selo-pronto { background: var(--ok-fundo); color: var(--ok); border-color: #BFE3CD; }
+.selo-entregue { background: #EEE; color: #555; border-color: #DDD; }
+.selo-cancelado { background: var(--erro-fundo); color: var(--erro); border-color: #F3C6C1; }
+.selo-pago { background: var(--ok-fundo); color: var(--ok); border-color: #BFE3CD; }
+.selo-pendente { background: #FFF4E0; color: #8A5300; border-color: #F5DDB0; }
+.selo-entrega { background: var(--marca-clara); color: var(--marca-escura); border-color: #EBCFC3; }
+
+.etapas { margin-bottom: 16px; }
+.etapas .discreto { margin: 0 0 8px; }
+.etapas-botoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.subtitulo { font-size: 1rem; margin: 16px 0 4px; }
+
+.tabela-itens, .tabela-producao { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.tabela-itens td { padding: 8px 4px; border-bottom: 1px solid var(--borda); vertical-align: top; }
+.tabela-itens tfoot td { border-bottom: 0; padding: 4px; color: var(--texto-suave); }
+.tabela-itens .linha-total td { color: var(--texto); font-weight: 700; font-size: 1.1rem; border-top: 2px solid var(--borda); padding-top: 8px; }
+.num { text-align: right; white-space: nowrap; }
+
+.tabela-producao { background: var(--cartao); border: 1px solid var(--borda); border-radius: 16px; overflow: hidden; box-shadow: var(--sombra); border-collapse: separate; border-spacing: 0; }
+.tabela-producao th, .tabela-producao td { padding: 12px 14px; border-bottom: 1px solid var(--borda); text-align: left; }
+.tabela-producao th.num, .tabela-producao td.num { text-align: right; }
+.tabela-producao thead th { background: var(--marca-clara); color: var(--marca-escura); font-size: .9rem; }
+.tabela-producao td strong { font-size: 1.3rem; color: var(--marca-escura); }
+.tabela-producao tfoot th, .tabela-producao tfoot td { border-bottom: 0; background: var(--fundo); font-weight: 700; }
+.bloco-espaco { margin-top: 24px; }
+
+.navegar-dia { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.navegar-dia .botao { font-size: 1.4rem; min-width: 48px; padding: 4px; }
+.navegar-dia-form { flex: 1; margin: 0; }
+.numeros-3 { margin-top: 12px; }
+@media (min-width: 760px) { .numeros-3 { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 759px) { .numeros-3 .numero-destaque { grid-column: 1 / -1; } }
+.numero-valor-dinheiro { font-size: 1.6rem; line-height: 1.4; }
+
+.producao-mini { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.producao-mini li { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--cartao); border: 1px solid var(--borda); border-radius: 12px; }
+.producao-mini strong { min-width: 42px; text-align: center; font-size: 1.25rem; color: var(--marca-escura); background: var(--marca-clara); border-radius: 8px; padding: 0 6px; font-variant-numeric: tabular-nums; }
+.linha-tempo-cancelado { opacity: .6; }
+.linha-tempo-pronto { border-left-color: var(--ok); }
+.linha-tempo-entregue { border-left-color: #AAA; }
+
+/* Formulário de pedido */
+.escolha { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.escolha-opcao { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 12px; border: 1px solid var(--borda); border-radius: 10px; background: #fff; font-weight: 600; cursor: pointer; }
+.escolha-opcao input { width: 20px; height: 20px; accent-color: var(--marca-escura); }
+.escolha-opcao:has(input:checked) { border-color: var(--marca); background: var(--marca-clara); color: var(--marca-escura); }
+.itens-pedido { display: grid; gap: 10px; }
+.item-pedido {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+}
+.item-pedido-produto, .item-pedido-nome, .item-pedido-obs { grid-column: 1 / -1; }
+.item-pedido-remover { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
+@media (min-width: 760px) {
+  .item-pedido { grid-template-columns: 2fr 2fr 90px 130px; align-items: end; }
+  .item-pedido-produto, .item-pedido-nome { grid-column: auto; }
+  .item-pedido-obs { grid-column: 1 / 4; }
+  .item-pedido-remover { grid-column: 4; }
+}
+.total-pedido { margin: 0; font-size: 1.15rem; text-align: right; }
+.total-pedido strong { font-size: 1.5rem; color: var(--marca-escura); }
+[hidden] { display: none !important; }
+
+@media (max-width: 899px) {
+  .acoes-fixas {
+    position: sticky;
+    bottom: calc(66px + env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, .96);
+    padding: 10px;
+    margin: 0 -10px;
+    border-radius: 12px;
+    box-shadow: 0 -2px 12px rgba(59, 42, 36, .08);
+    z-index: 5;
+  }
+  .acoes-fixas .botao-principal { flex: 1; }
+}
+
+/* Folha da produção impressa: só a tabela, sem menus */
+@media print {
+  .topo, .menu-baixo, .rodape, .navegar-dia, .cabecalho .botao, .discreto a, .pedido-acoes { display: none !important; }
+  body { background: #fff; font-size: 13px; }
+  .conteudo { padding: 0; max-width: none; }
+  .tabela-producao, .cartao, .numero { box-shadow: none; }
+}

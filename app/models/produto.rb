@@ -1,5 +1,6 @@
 class Produto < ApplicationRecord
   has_many :ingredientes, dependent: :destroy
+  has_many :pedido_itens, class_name: "PedidoItem", dependent: :nullify
 
   validates :nome, presence: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 60 }
   validates :descricao, presence: true

@@ -14,6 +14,10 @@ class PainelController < ApplicationController
 
     @produtos = Produto.count
     @unidades_em_estoque = Produto.sum(:quantidade)
+    @pedidos_hoje = Pedido.ativos.do_dia(@hoje).includes(:itens).em_ordem.to_a
+    @pedidos_semana = Pedido.ativos.where(data: @hoje..(@hoje + DIAS_A_FRENTE - 1)).count
+    @a_receber = Pedido.ativos.where(pagamento: "pendente", data: (@hoje - 30)..).sum(:total)
+    @producao_hoje = Pedidos::ProducaoDoDia.new(@hoje)
     @alertas = montar_alertas
   end
 
@@ -24,8 +28,9 @@ class PainelController < ApplicationController
   private
 
   def semana_com_contagem
-    contagem = Agenda.where(data: @hoje..(@hoje + DIAS_A_FRENTE - 1)).group(:data).count
-    (0...DIAS_A_FRENTE).map { |i| dia = @hoje + i; [dia, contagem.fetch(dia, 0)] }
+    periodo = @hoje..(@hoje + DIAS_A_FRENTE - 1)
+    pedidos = Pedido.ativos.where(data: periodo).group(:data).count
+    (0...DIAS_A_FRENTE).map { |i| dia = @hoje + i; [dia, pedidos.fetch(dia, 0)] }
   end
 
   def montar_alertas

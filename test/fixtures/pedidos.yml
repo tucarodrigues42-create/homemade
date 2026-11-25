@@ -1,0 +1,41 @@
+maria_hoje:
+  cliente: maria
+  nome_cliente: Maria das Graças
+  whatsapp: "82999990000"
+  tipo_entrega: entrega
+  endereco_entrega: Rua Boa Vista, 100 – Centro
+  data: <%= Date.current %>
+  horario: "15:00"
+  status: novo
+  pagamento: pendente
+  total: 199.70
+
+joao_hoje:
+  cliente: joao
+  nome_cliente: João Pereira
+  whatsapp: "82988887777"
+  tipo_entrega: retirada
+  data: <%= Date.current %>
+  horario: "10:00"
+  status: pronto
+  pagamento: pago
+  forma_pagamento: pix
+  total: 59.90
+
+cancelado_hoje:
+  nome_cliente: Ana Cancelou
+  tipo_entrega: retirada
+  data: <%= Date.current %>
+  status: cancelado
+  pagamento: pendente
+  total: 80.00
+
+ana_amanha:
+  nome_cliente: Ana Lúcia
+  whatsapp: "82977776666"
+  tipo_entrega: retirada
+  data: <%= Date.current + 1 %>
+  status: confirmado
+  pagamento: pendente
+  descricao: Bolo de pote de Ninho com morango, sem lactose
+  total: 0

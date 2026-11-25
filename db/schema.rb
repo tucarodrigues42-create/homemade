@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_11_25_130000) do
+ActiveRecord::Schema[7.2].define(version: 2026_11_25_140000) do
   create_table "agendas", force: :cascade do |t|
     t.text "mensagem"
     t.datetime "created_at", null: false
@@ -55,6 +55,41 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_25_130000) do
     t.index ["produto_id"], name: "index_ingredientes_on_produto_id"
   end
 
+  create_table "pedido_itens", force: :cascade do |t|
+    t.integer "pedido_id", null: false
+    t.integer "produto_id"
+    t.string "nome", null: false
+    t.integer "quantidade", default: 1, null: false
+    t.decimal "preco_unitario", precision: 10, scale: 2, default: "0.0", null: false
+    t.string "observacao"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pedido_id"], name: "index_pedido_itens_on_pedido_id"
+    t.index ["produto_id"], name: "index_pedido_itens_on_produto_id"
+  end
+
+  create_table "pedidos", force: :cascade do |t|
+    t.integer "cliente_id"
+    t.string "nome_cliente", null: false
+    t.string "whatsapp"
+    t.string "tipo_entrega", default: "retirada", null: false
+    t.text "endereco_entrega"
+    t.date "data", null: false
+    t.time "horario"
+    t.string "status", default: "novo", null: false
+    t.string "pagamento", default: "pendente", null: false
+    t.string "forma_pagamento"
+    t.decimal "taxa_entrega", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "desconto", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "total", precision: 10, scale: 2, default: "0.0", null: false
+    t.text "descricao"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cliente_id"], name: "index_pedidos_on_cliente_id"
+    t.index ["data"], name: "index_pedidos_on_data"
+    t.index ["status"], name: "index_pedidos_on_status"
+  end
+
   create_table "produtos", force: :cascade do |t|
     t.string "nome"
     t.text "descricao"
@@ -76,4 +111,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_25_130000) do
 
   add_foreign_key "clientes", "enderecos"
   add_foreign_key "ingredientes", "produtos"
+  add_foreign_key "pedido_itens", "pedidos", on_delete: :cascade
+  add_foreign_key "pedido_itens", "produtos", on_delete: :nullify
+  add_foreign_key "pedidos", "clientes", on_delete: :nullify
 end
