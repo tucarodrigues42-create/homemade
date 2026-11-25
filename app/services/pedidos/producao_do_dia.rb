@@ -26,32 +26,26 @@ module Pedidos
 
     private
 
+    # Uma consulta só traz as linhas dos itens; a soma é feita aqui com inteiros (exata).
     def itens
-      PedidoItem.joins(:pedido).merge(pedidos)
+      @itens ||= PedidoItem.joins(:pedido).merge(pedidos).pluck(:produto_id, :nome, :quantidade, :pedido_id)
     end
 
     # Itens ligados ao cadastro de produtos: agrupa pelo produto, com o nome atual.
     def linhas_de_produtos
-      com_produto = itens.where.not(produto_id: nil)
-      quantidades = com_produto.group(:produto_id).sum(:quantidade)
-      contagem = com_produto.group(:produto_id).distinct.count(:pedido_id)
-      nomes = Produto.where(id: quantidades.keys).pluck(:id, :nome).to_h
-      nomes_copiados = com_produto.group(:produto_id).maximum(:nome)
-      quantidades.map do |produto_id, qtd|
-        Linha.new(produto_id: produto_id, nome: nomes[produto_id] || nomes_copiados[produto_id],
-                  quantidade: qtd.to_i, pedidos: contagem[produto_id].to_i)
+      com_produto = itens.select(&:first)
+      nomes = Produto.where(id: com_produto.map(&:first).uniq).pluck(:id, :nome).to_h
+      com_produto.group_by(&:first).map do |produto_id, linhas|
+        Linha.new(produto_id: produto_id, nome: nomes[produto_id] || linhas.map { |l| l[1] }.max,
+                  quantidade: linhas.sum { |l| l[2].to_i }, pedidos: linhas.map(&:last).uniq.size)
       end
     end
 
     # Itens escritos à mão (sem produto cadastrado): agrupa pelo nome, sem diferenciar maiúsculas.
     def linhas_avulsas
-      chave = Arel.sql("LOWER(TRIM(pedido_itens.nome))")
-      avulsos = itens.where(produto_id: nil)
-      quantidades = avulsos.group(chave).sum(:quantidade)
-      contagem = avulsos.group(chave).distinct.count(:pedido_id)
-      nomes = avulsos.group(chave).minimum(:nome)
-      quantidades.map do |nome, qtd|
-        Linha.new(produto_id: nil, nome: nomes[nome].to_s.strip, quantidade: qtd.to_i, pedidos: contagem[nome].to_i)
+      itens.reject(&:first).group_by { |l| l[1].to_s.strip.downcase }.map do |_chave, linhas|
+        Linha.new(produto_id: nil, nome: linhas.map { |l| l[1].to_s.strip }.min,
+                  quantidade: linhas.sum { |l| l[2].to_i }, pedidos: linhas.map(&:last).uniq.size)
       end
     end
   end

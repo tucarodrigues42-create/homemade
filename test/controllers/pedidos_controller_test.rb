@@ -108,4 +108,21 @@ class PedidosControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to pedidos_url
   end
+
+  test "lista longa mostra aos poucos, com totais de todos" do
+    45.times { |i| Pedido.create!(nome_cliente: "Cliente #{i}", data: Date.current + 3, descricao: "x", total: 10) }
+    get pedidos_url(periodo: "proximos")
+    assert_select ".pedido", PedidosController::POR_PAGINA
+    assert_select ".resumo-lista strong", "49 pedidos"
+    assert_select ".carregar-mais a[href*='limite=80']"
+    get pedidos_url(periodo: "proximos", limite: 80)
+    assert_select ".pedido", 49
+    assert_select ".carregar-mais", 0
+  end
+
+  test "carrega o Turbo para a navegação rápida" do
+    get pedidos_url
+    assert_select "script[type=module][src*=turbo]"
+    assert_select "meta[name=turbo-refresh-method][content=morph]"
+  end
 end

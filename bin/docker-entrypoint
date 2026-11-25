@@ -3,7 +3,8 @@
 if [ "${@: -1:1}" == "./bin/rails server -b 0.0.0.0 -p ${PORT}" ] || [[ "$*" == *"rails server"* ]]; then
   # Duas instâncias podem subir juntas e tentar migrar ao mesmo tempo (o pooler do
   # Neon não aceita trava de migração). Se uma falhar, espera a outra e tenta de novo.
-  ./bin/rails db:prepare || { sleep 5; ./bin/rails db:prepare; }
-  ./bin/rails db:seed
+  # Uma única inicialização do Rails para migrar e garantir o administrador (mais rápido
+  # na primeira visita depois de o servidor ficar parado).
+  ./bin/rails db:prepare db:seed || { sleep 5; ./bin/rails db:prepare db:seed; }
 fi
 exec "${@}"

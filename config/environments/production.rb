@@ -23,6 +23,10 @@ Rails.application.configure do
   # Disable serving static files from `public/`, relying on NGINX/Apache to do so instead.
   # config.public_file_server.enabled = false
 
+  # Arquivos com impressão digital no nome (CSS, JS, logos) nunca mudam: o navegador e a
+  # rede da Vercel podem guardar por 1 ano, sem perguntar ao servidor a cada tela.
+  config.public_file_server.headers = { "cache-control" => "public, max-age=31536000, immutable" }
+
   # Compress CSS using a preprocessor.
   # config.assets.css_compressor = :sass
 

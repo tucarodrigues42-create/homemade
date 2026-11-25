@@ -3,13 +3,14 @@ class PedidosController < ApplicationController
   before_action :carregar_opcoes, only: %i[new edit create update]
 
   ITENS_EM_BRANCO = 1
+  POR_PAGINA = 40
 
   def index
     @dia = ler_data(params[:dia])
     @filtros = params.permit(:q, :dia, :tipo, :pagamento, :status, :periodo).to_h.symbolize_keys
     @periodo = params[:periodo].presence || (@dia ? "dia" : "proximos")
 
-    @pedidos = Pedido.includes(:itens).em_ordem
+    @pedidos = Pedido.em_ordem
     @pedidos = case @periodo
                when "dia" then @pedidos.do_dia(@dia || Date.current)
                when "proximos" then @pedidos.where(data: Date.current..)
@@ -26,8 +27,21 @@ class PedidosController < ApplicationController
     end
 
     @dia_exibido = @dia || Date.current if @periodo == "dia"
-    @total_valor = @pedidos.reject(&:cancelado?).sum(&:total)
-    @a_receber = @pedidos.reject { |p| p.cancelado? || p.pago? }.sum(&:total)
+
+    # Totais calculados no banco, sobre todos os pedidos filtrados.
+    quantidade, total, a_receber = @pedidos.unscope(:order).pick(
+      Arel.sql("COUNT(*)"),
+      Arel.sql("COALESCE(SUM(CASE WHEN status <> 'cancelado' THEN total END), 0)"),
+      Arel.sql("COALESCE(SUM(CASE WHEN status <> 'cancelado' AND pagamento <> 'pago' THEN total END), 0)")
+    )
+    @quantidade = quantidade.to_i
+    @total_valor = total.to_d
+    @a_receber = a_receber.to_d
+
+    # Mostra aos poucos: listas longas (ex.: "Todos") abrem rápido e carregam mais ao tocar.
+    @limite = params[:limite].to_i.clamp(POR_PAGINA, 2000)
+    @pedidos = @pedidos.includes(:itens).limit(@limite).to_a
+    @tem_mais = @quantidade > @pedidos.size
   end
 
   def producao

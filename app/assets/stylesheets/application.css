@@ -684,3 +684,24 @@ input:focus, select:focus, textarea:focus { border-color: var(--marca); outline:
 .ranking-valor strong { color: var(--texto); }
 .ranking-trilho { height: 6px; background: var(--fundo); border-radius: 999px; overflow: hidden; }
 .ranking-trilho span { display: block; height: 100%; background: var(--serie-recebido); border-radius: 999px; }
+
+/* ---------- Fluidez ---------- */
+.carregar-mais { display: grid; justify-items: center; gap: 8px; margin: 16px 0; }
+
+/* Barra de carregamento do topo (aparece só se a tela demorar) na cor da marca */
+.turbo-progress-bar { height: 3px; background: var(--marca-escura); }
+
+/* Entrada suave do conteúdo de cada tela (curta, para não atrasar) */
+.conteudo { animation: surgir 160ms ease-out; }
+@keyframes surgir { from { opacity: .4; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .conteudo { animation: none; } }
+
+/* Resposta imediata ao toque */
+.botao, .atalho, .aba, .numero, .lista-menu-item, .semana-dia, .linha-tempo-item, .abas-periodo a, .menu-item {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease, background-color .12s ease, box-shadow .12s ease;
+}
+.botao:active, .atalho:active, .numero:active, .semana-dia:active, .linha-tempo-item:active, .abas-periodo a:active { transform: scale(.97); }
+.aba:active .icone { transform: scale(.9); }
+.aba .icone { transition: background-color .15s ease, transform .08s ease; }
+button[disabled], input[type="submit"][disabled] { opacity: .7; cursor: progress; }

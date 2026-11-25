@@ -31,7 +31,7 @@
 <% end %>
 
 <p class="resumo-lista">
-  <strong><%= pluralize(@pedidos.size, "pedido", plural: "pedidos") %></strong>
+  <strong><%= pluralize(@quantidade, "pedido", plural: "pedidos") %></strong>
   <% if @dia_exibido %> em <%= l(@dia_exibido, format: "%d/%m") %><% end %>
   · total <%= reais(@total_valor) %>
   <% if @a_receber.positive? %> · <span class="a-receber">a receber <%= reais(@a_receber) %></span><% end %>
@@ -44,7 +44,14 @@
   </div>
 <% else %>
   <% @pedidos.group_by(&:data).each do |data, pedidos| %>
-    <h2 class="dia"><%= dia_da_semana(data) %> <small class="discreto">· <%= pluralize(pedidos.size, "pedido", plural: "pedidos") %></small></h2>
+    <h2 class="dia"><%= dia_da_semana(data) %> <small class="discreto">· <%= pluralize(pedidos.size, "pedido", plural: "pedidos") %><%= " (parcial)" if @tem_mais && data == @pedidos.last.data %></small></h2>
     <ul class="lista"><%= render partial: "pedidos/pedido", collection: pedidos %></ul>
+  <% end %>
+  <% if @tem_mais %>
+    <div class="carregar-mais">
+      <p class="discreto">Mostrando <%= @pedidos.size %> de <%= @quantidade %> pedidos</p>
+      <%= link_to "Mostrar mais pedidos", pedidos_path(request.query_parameters.merge(limite: @limite + PedidosController::POR_PAGINA)),
+                  class: "botao", data: { turbo_action: "replace" } %>
+    </div>
   <% end %>
 <% end %>
