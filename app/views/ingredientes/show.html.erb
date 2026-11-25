@@ -1,0 +1,15 @@
+<% content_for :title, @ingrediente.nome %>
+<%= render "shared/cabecalho", titulo: @ingrediente.nome %>
+<dl class="cartao detalhes">
+  <dt>Produto</dt><dd><%= link_to @ingrediente.produto.nome, @ingrediente.produto %></dd>
+  <dt>Preço</dt><dd><%= reais(@ingrediente.preco) %></dd>
+  <dt>Em estoque</dt><dd><%= @ingrediente.quantidade %></dd>
+  <dt>Validade</dt>
+  <dd class="<%= "alerta" if @ingrediente.vencido? %>"><%= data_br(@ingrediente.vencimento) %><%= " (vencido)" if @ingrediente.vencido? %></dd>
+  <dt>Descrição</dt><dd class="texto-longo"><%= @ingrediente.descricao %></dd>
+</dl>
+<div class="acoes">
+  <%= link_to "Editar", edit_ingrediente_path(@ingrediente), class: "botao botao-principal" %>
+  <%= link_to "Voltar", ingredientes_path, class: "botao" %>
+  <%= botao_excluir @ingrediente %>
+</div>

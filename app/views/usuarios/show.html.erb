@@ -1,0 +1,11 @@
+<% content_for :title, @usuario.email %>
+<%= render "shared/cabecalho", titulo: @usuario.email %>
+<dl class="cartao detalhes">
+  <dt>Perfil</dt><dd><%= @usuario.adm? ? "Administrador" : "Equipe" %></dd>
+</dl>
+<div class="acoes">
+  <% if current_user.adm? || @usuario == current_user %>
+    <%= link_to "Editar", edit_usuario_path(@usuario), class: "botao botao-principal" %>
+  <% end %>
+  <%= link_to "Voltar", usuarios_path, class: "botao" %>
+</div>

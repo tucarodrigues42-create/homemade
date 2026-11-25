@@ -1,0 +1,11 @@
+<% content_for :title, "Compromisso" %>
+<%= render "shared/cabecalho", titulo: dia_da_semana(@agenda.data) %>
+<div class="cartao">
+  <% if @agenda.horario %><p><span class="etiqueta"><%= hora_br(@agenda.horario) %></span></p><% end %>
+  <p class="texto-longo"><%= @agenda.mensagem %></p>
+</div>
+<div class="acoes">
+  <%= link_to "Editar", edit_agenda_path(@agenda), class: "botao botao-principal" %>
+  <%= link_to "Voltar", agendas_path, class: "botao" %>
+  <%= botao_excluir @agenda %>
+</div>

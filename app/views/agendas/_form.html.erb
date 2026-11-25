@@ -1,0 +1,21 @@
+<%= form_with model: agenda, local: true, class: "formulario cartao" do |form| %>
+  <%= render "shared/erros", registro: agenda %>
+  <div class="linha">
+    <div class="campo">
+      <%= form.label :data %>
+      <%= form.date_field :data %>
+    </div>
+    <div class="campo">
+      <%= form.label :horario %>
+      <%= form.time_field :horario %>
+    </div>
+  </div>
+  <div class="campo">
+    <%= form.label :mensagem %>
+    <%= form.text_area :mensagem, rows: 6, placeholder: "Ex.: Entregar 2 panetones trufados para Maria no Centro" %>
+  </div>
+  <div class="acoes">
+    <%= form.submit "Salvar", class: "botao botao-principal" %>
+    <%= link_to "Cancelar", agendas_path, class: "botao" %>
+  </div>
+<% end %>

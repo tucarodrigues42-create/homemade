@@ -1,0 +1,11 @@
+maria:
+  nome: Maria das Graças
+  celular: "82999990000"
+  telefone: ""
+  email: maria@example.com
+  endereco: centro
+
+joao:
+  nome: João Pereira
+  celular: "82988887777"
+  email: ""

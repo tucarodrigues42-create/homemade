@@ -1,0 +1,48 @@
+pt-BR:
+  activerecord:
+    models:
+      agenda: { one: "Compromisso", other: "Agenda" }
+      cliente: { one: "Cliente", other: "Clientes" }
+      endereco: { one: "Endereço", other: "Endereços" }
+      produto: { one: "Produto", other: "Produtos" }
+      ingrediente: { one: "Ingrediente", other: "Ingredientes" }
+      usuario: { one: "Usuário", other: "Usuários" }
+    attributes:
+      agenda:
+        mensagem: "Descrição"
+        data: "Data"
+        horario: "Horário"
+      cliente:
+        nome: "Nome"
+        telefone: "Telefone fixo"
+        celular: "WhatsApp"
+        email: "E-mail"
+        endereco: "Endereço"
+      endereco:
+        rua: "Rua"
+        numero: "Número"
+        bairro: "Bairro"
+        cidade: "Cidade"
+        cep: "CEP"
+        estado: "Estado"
+        complemento: "Complemento / ponto de referência"
+      produto:
+        nome: "Nome"
+        descricao: "Descrição"
+        fabricacao: "Fabricação"
+        vencimento: "Validade"
+        quantidade: "Quantidade em estoque"
+        preco: "Preço (R$)"
+        ingredientes: "Ingredientes"
+      ingrediente:
+        nome: "Nome"
+        descricao: "Descrição"
+        preco: "Preço (R$)"
+        quantidade: "Quantidade em estoque"
+        vencimento: "Validade"
+        produto: "Produto"
+      usuario:
+        email: "E-mail"
+        password: "Senha"
+        password_confirmation: "Confirme a senha"
+        adm: "Administrador"

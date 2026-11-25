@@ -1,0 +1,7 @@
+chocolate:
+  nome: Chocolate meio amargo
+  descricao: Barra de 1kg
+  preco: 45.00
+  quantidade: 3
+  vencimento: <%= Date.current + 90 %>
+  produto: panetone

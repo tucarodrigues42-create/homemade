@@ -1,0 +1,35 @@
+<%= form_with model: produto, local: true, class: "formulario cartao" do |form| %>
+  <%= render "shared/erros", registro: produto %>
+  <div class="campo">
+    <%= form.label :nome %>
+    <%= form.text_field :nome, required: true, placeholder: "Ex.: Panetone trufado 500g" %>
+  </div>
+  <div class="campo">
+    <%= form.label :descricao %>
+    <%= form.text_area :descricao, rows: 4, required: true %>
+  </div>
+  <div class="linha">
+    <div class="campo">
+      <%= form.label :preco %>
+      <%= form.number_field :preco, step: "0.01", min: 0, inputmode: "decimal", required: true %>
+    </div>
+    <div class="campo">
+      <%= form.label :quantidade %>
+      <%= form.number_field :quantidade, min: 0, step: 1, inputmode: "numeric", required: true %>
+    </div>
+  </div>
+  <div class="linha">
+    <div class="campo">
+      <%= form.label :fabricacao %>
+      <%= form.date_field :fabricacao, required: true %>
+    </div>
+    <div class="campo">
+      <%= form.label :vencimento %>
+      <%= form.date_field :vencimento, required: true %>
+    </div>
+  </div>
+  <div class="acoes">
+    <%= form.submit "Salvar", class: "botao botao-principal" %>
+    <%= link_to "Cancelar", (produto.persisted? ? produto : produtos_path), class: "botao" %>
+  </div>
+<% end %>

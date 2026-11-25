@@ -1,0 +1,10 @@
+<% if registro.errors.any? %>
+  <div class="erros" role="alert">
+    <p><strong>Corrija <%= registro.errors.count == 1 ? "o item abaixo" : "os #{registro.errors.count} itens abaixo" %>:</strong></p>
+    <ul>
+      <% registro.errors.full_messages.uniq.each do |mensagem| %>
+        <li><%= mensagem %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

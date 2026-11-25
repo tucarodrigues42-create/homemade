@@ -1,0 +1,16 @@
+centro:
+  rua: Rua Expedicionários Brasileiros
+  numero: "120"
+  bairro: Centro
+  cidade: Arapiraca
+  cep: "57300000"
+  estado: AL
+  complemento: Perto da praça
+
+baixa_grande:
+  rua: Rua São Francisco
+  numero: "45"
+  bairro: Baixa Grande
+  cidade: Arapiraca
+  cep: "57307000"
+  estado: AL

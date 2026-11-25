@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <title><%= [content_for(:title), "Homemade Confeitaria"].compact.join(" · ") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#BC6C50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Homemade">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+    <%= stylesheet_link_tag "application" %>
+  </head>
+
+  <body>
+    <header class="topo">
+      <div class="topo-conteudo">
+        <%= link_to root_path, class: "marca", "aria-label": "Homemade Confeitaria – início" do %>
+          <%= image_tag "homemade-logo-branco.svg", alt: "Homemade Confeitaria", class: "marca-logo" %>
+        <% end %>
+        <% if logged_in? %>
+          <%= button_to "Sair", sessions_path, method: :delete, class: "botao-sair", form: { class: "form-inline" } %>
+        <% end %>
+      </div>
+      <% if logged_in? %>
+        <nav class="menu" aria-label="Menu principal">
+          <%= item_menu "Agenda", agendas_path, "agendas" %>
+          <%= item_menu "Clientes", clientes_path, "clientes" %>
+          <%= item_menu "Endereços", enderecos_path, "enderecos" %>
+          <%= item_menu "Produtos", produtos_path, "produtos" %>
+          <%= item_menu "Ingredientes", ingredientes_path, "ingredientes" %>
+          <%= item_menu "Usuários", usuarios_path, "usuarios" %>
+        </nav>
+      <% end %>
+    </header>
+
+    <main class="conteudo">
+      <% if notice.present? %><p class="aviso aviso-ok" role="status"><%= notice %></p><% end %>
+      <% if alert.present? %><p class="aviso aviso-erro" role="alert"><%= alert %></p><% end %>
+      <%= yield %>
+    </main>
+
+    <footer class="rodape">
+      Homemade Confeitaria · Arapiraca – AL
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+<% content_for :title, "Agenda" %>
+<%= render "shared/cabecalho", titulo: "Agenda", botao_texto: "+ Novo compromisso", botao_caminho: new_agenda_path(dia: @dia) %>
+
+<%= form_with url: agendas_path, method: :get, local: true, class: "filtro" do |form| %>
+  <%= form.label :dia, "Ver o dia", class: "visualmente-oculto" %>
+  <%= form.date_field :dia, value: @dia %>
+  <%= form.submit "Filtrar", class: "botao", name: nil %>
+  <%= link_to "Hoje", agendas_path(dia: Date.current), class: "botao" %>
+  <% if @dia %><%= link_to "Ver tudo", agendas_path, class: "botao" %><% end %>
+<% end %>
+
+<% if @agendas.empty? %>
+  <p class="vazio"><%= @dia ? "Nada marcado para #{data_br(@dia)}." : "A agenda está vazia." %></p>
+<% else %>
+  <% @agendas.group_by(&:data).each do |data, compromissos| %>
+    <h2 class="dia"><%= dia_da_semana(data) %></h2>
+    <ul class="lista">
+      <% compromissos.each do |agenda| %>
+        <li class="cartao item">
+          <div class="item-texto">
+            <% if agenda.horario %><span class="etiqueta"><%= hora_br(agenda.horario) %></span><% end %>
+            <p class="texto-longo"><%= agenda.mensagem %></p>
+          </div>
+          <div class="item-acoes">
+            <%= link_to "Editar", edit_agenda_path(agenda), class: "botao" %>
+            <%= botao_excluir agenda %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>

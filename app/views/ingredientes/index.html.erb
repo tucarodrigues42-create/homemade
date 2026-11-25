@@ -1,0 +1,22 @@
+<% content_for :title, "Ingredientes" %>
+<%= render "shared/cabecalho", titulo: "Ingredientes", botao_texto: "+ Novo ingrediente", botao_caminho: new_ingrediente_path %>
+<% if @ingredientes.empty? %>
+  <p class="vazio">Nenhum ingrediente cadastrado ainda.</p>
+<% else %>
+  <ul class="lista">
+    <% @ingredientes.each do |ingrediente| %>
+      <li class="cartao item">
+        <div class="item-texto">
+          <h2 class="item-titulo"><%= link_to ingrediente.nome, ingrediente %></h2>
+          <p class="discreto">
+            <%= ingrediente.produto.nome %> · <%= ingrediente.quantidade %> em estoque ·
+            <span class="<%= "alerta" if ingrediente.vencido? %>">validade <%= data_br(ingrediente.vencimento) %></span>
+          </p>
+        </div>
+        <div class="item-acoes">
+          <%= link_to "Editar", edit_ingrediente_path(ingrediente), class: "botao" %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
