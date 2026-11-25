@@ -1,0 +1,125 @@
+<% content_for :title, "Início" %>
+
+<section class="boas-vindas">
+  <p class="boas-vindas-data"><%= dia_da_semana(@hoje) %></p>
+  <h1><%= saudacao %>!</h1>
+  <p class="discreto">
+    <% if @agenda_hoje.any? %>
+      Você tem <strong><%= pluralize(@agenda_hoje.size, "compromisso", plural: "compromissos") %></strong> para hoje.
+    <% else %>
+      Nada marcado para hoje até agora.
+    <% end %>
+  </p>
+</section>
+
+<div class="atalhos">
+  <%= link_to new_agenda_path(dia: @hoje), class: "atalho" do %><%= icone(:mais_item) %><span>Compromisso</span><% end %>
+  <%= link_to new_cliente_path, class: "atalho" do %><%= icone(:mais_item) %><span>Cliente</span><% end %>
+  <%= link_to new_produto_path, class: "atalho" do %><%= icone(:mais_item) %><span>Produto</span><% end %>
+</div>
+
+<section class="numeros" aria-label="Resumo">
+  <%= link_to agendas_path(dia: @hoje), class: "numero numero-destaque" do %>
+    <span class="numero-rotulo"><%= icone(:agenda) %> Hoje</span>
+    <strong class="numero-valor"><%= @agenda_hoje.size %></strong>
+    <span class="numero-detalhe">compromissos</span>
+  <% end %>
+  <%= link_to agendas_path, class: "numero" do %>
+    <span class="numero-rotulo"><%= icone(:agenda) %> Próximos 7 dias</span>
+    <strong class="numero-valor"><%= @proximos.size %></strong>
+    <span class="numero-detalhe"><%= @sem_data.positive? ? "+ #{@sem_data} sem data" : "compromissos" %></span>
+  <% end %>
+  <%= link_to clientes_path, class: "numero" do %>
+    <span class="numero-rotulo"><%= icone(:clientes) %> Clientes</span>
+    <strong class="numero-valor"><%= @total_clientes %></strong>
+    <span class="numero-detalhe"><%= @clientes_novos_mes %> novos este mês</span>
+  <% end %>
+  <%= link_to produtos_path, class: "numero" do %>
+    <span class="numero-rotulo"><%= icone(:produtos) %> Produtos</span>
+    <strong class="numero-valor"><%= @produtos %></strong>
+    <span class="numero-detalhe"><%= @unidades_em_estoque %> unidades em estoque</span>
+  <% end %>
+</section>
+
+<section class="bloco" aria-labelledby="titulo-semana">
+  <h2 id="titulo-semana" class="bloco-titulo">Sua semana</h2>
+  <ol class="semana">
+    <% @semana.each do |dia, total| %>
+      <li>
+        <%= link_to agendas_path(dia: dia), class: ["semana-dia", ("hoje" if dia == @hoje), ("vazio" if total.zero?)].compact.join(" "),
+                    "aria-label": "#{l(dia, format: '%A, %d/%m')}: #{pluralize(total, 'compromisso', plural: 'compromissos')}" do %>
+          <span class="semana-nome"><%= dia == @hoje ? "Hoje" : l(dia, format: "%a").delete(".").capitalize %></span>
+          <span class="semana-numero"><%= dia.day %></span>
+          <span class="semana-total"><%= total.zero? ? "–" : total %></span>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+</section>
+
+<div class="colunas">
+  <section class="bloco" aria-labelledby="titulo-hoje">
+    <div class="bloco-cabecalho">
+      <h2 id="titulo-hoje" class="bloco-titulo">Agenda de hoje</h2>
+      <%= link_to "Ver agenda", agendas_path(dia: @hoje), class: "link-discreto" %>
+    </div>
+    <% if @agenda_hoje.empty? %>
+      <div class="vazio vazio-pequeno">
+        <p>Nenhum compromisso para hoje.</p>
+        <%= link_to "+ Marcar compromisso", new_agenda_path(dia: @hoje), class: "botao" %>
+      </div>
+    <% else %>
+      <ul class="linha-tempo">
+        <% @agenda_hoje.each do |agenda| %>
+          <li>
+            <%= link_to edit_agenda_path(agenda), class: "linha-tempo-item" do %>
+              <span class="linha-tempo-hora"><%= hora_br(agenda.horario) || "—" %></span>
+              <span class="linha-tempo-texto"><%= truncate(agenda.mensagem, length: 140) %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </section>
+
+  <section class="bloco" aria-labelledby="titulo-proximos">
+    <div class="bloco-cabecalho">
+      <h2 id="titulo-proximos" class="bloco-titulo">Próximos dias</h2>
+      <%= link_to "Ver tudo", agendas_path, class: "link-discreto" %>
+    </div>
+    <% if @proximos.empty? %>
+      <div class="vazio vazio-pequeno"><p>Nada marcado para os próximos 7 dias.</p></div>
+    <% else %>
+      <ul class="linha-tempo">
+        <% @proximos.first(6).each do |agenda| %>
+          <li>
+            <%= link_to edit_agenda_path(agenda), class: "linha-tempo-item" do %>
+              <span class="linha-tempo-hora"><%= agenda.data.strftime("%d/%m") %><small><%= hora_br(agenda.horario) %></small></span>
+              <span class="linha-tempo-texto"><%= truncate(agenda.mensagem, length: 100) %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      <% if @proximos.size > 6 %>
+        <p class="discreto mais-itens">e mais <%= @proximos.size - 6 %>…</p>
+      <% end %>
+    <% end %>
+  </section>
+</div>
+
+<section class="bloco" aria-labelledby="titulo-atencao">
+  <h2 id="titulo-atencao" class="bloco-titulo">Atenção</h2>
+  <% if @alertas.empty? %>
+    <p class="tudo-certo">Tudo certo com validades e estoque.</p>
+  <% else %>
+    <ul class="alertas">
+      <% @alertas.first(8).each do |alerta| %>
+        <li>
+          <%= link_to alerta[:link], class: "alerta-item alerta-#{alerta[:tipo]}" do %>
+            <%= icone(:alerta) %><span><%= alerta[:texto] %></span><%= icone(:seta, classe: "icone seta") %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

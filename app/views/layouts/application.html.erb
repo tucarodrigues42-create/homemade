@@ -2,9 +2,10 @@
 <html lang="pt-BR">
   <head>
     <title><%= [content_for(:title), "Homemade Confeitaria"].compact.join(" · ") %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#BC6C50">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Homemade">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -18,26 +19,27 @@
     <%= stylesheet_link_tag "application" %>
   </head>
 
-  <body>
+  <body class="<%= "com-menu" if logged_in? %>">
     <header class="topo">
       <div class="topo-conteudo">
         <%= link_to root_path, class: "marca", "aria-label": "Homemade Confeitaria – início" do %>
           <%= image_tag "homemade-logo-branco.svg", alt: "Homemade Confeitaria", class: "marca-logo" %>
         <% end %>
         <% if logged_in? %>
-          <%= button_to "Sair", sessions_path, method: :delete, class: "botao-sair", form: { class: "form-inline" } %>
+          <nav class="menu-topo" aria-label="Menu principal">
+            <%= item_menu "Início", root_path, "painel", :inicio %>
+            <%= item_menu "Agenda", agendas_path, "agendas", :agenda %>
+            <%= item_menu "Clientes", clientes_path, "clientes", :clientes %>
+            <%= item_menu "Produtos", produtos_path, "produtos", :produtos %>
+            <%= item_menu "Ingredientes", ingredientes_path, "ingredientes", :ingredientes %>
+            <%= item_menu "Endereços", enderecos_path, "enderecos", :enderecos %>
+            <%= item_menu "Usuários", usuarios_path, "usuarios", :usuarios %>
+          </nav>
+          <%= button_to sessions_path, method: :delete, class: "botao-sair", form: { class: "form-inline" }, "aria-label": "Sair do sistema" do %>
+            <%= icone(:sair) %><span>Sair</span>
+          <% end %>
         <% end %>
       </div>
-      <% if logged_in? %>
-        <nav class="menu" aria-label="Menu principal">
-          <%= item_menu "Agenda", agendas_path, "agendas" %>
-          <%= item_menu "Clientes", clientes_path, "clientes" %>
-          <%= item_menu "Endereços", enderecos_path, "enderecos" %>
-          <%= item_menu "Produtos", produtos_path, "produtos" %>
-          <%= item_menu "Ingredientes", ingredientes_path, "ingredientes" %>
-          <%= item_menu "Usuários", usuarios_path, "usuarios" %>
-        </nav>
-      <% end %>
     </header>
 
     <main class="conteudo">
@@ -49,5 +51,15 @@
     <footer class="rodape">
       Homemade Confeitaria · Arapiraca – AL
     </footer>
+
+    <% if logged_in? %>
+      <nav class="menu-baixo" aria-label="Menu principal">
+        <%= item_menu "Início", root_path, "painel", :inicio, classe: "aba" %>
+        <%= item_menu "Agenda", agendas_path, "agendas", :agenda, classe: "aba" %>
+        <%= item_menu "Clientes", clientes_path, "clientes", :clientes, classe: "aba" %>
+        <%= item_menu "Produtos", produtos_path, "produtos", :produtos, classe: "aba" %>
+        <%= item_menu "Mais", mais_path, "mais", :mais, classe: "aba" %>
+      </nav>
+    <% end %>
   </body>
 </html>

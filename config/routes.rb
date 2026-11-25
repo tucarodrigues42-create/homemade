@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  root "agendas#index"
+  root "painel#index"
+  get "/mais", to: "painel#mais", as: :mais
 
   resources :agendas
   resources :clientes

@@ -17,7 +17,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     entrar_como usuarios(:admin)
     assert_redirected_to root_url
     follow_redirect!
-    assert_select "nav.menu"
+    assert_select "nav.menu-baixo"
   end
 
   test "não entra com senha errada" do

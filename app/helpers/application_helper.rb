@@ -21,9 +21,52 @@ module ApplicationHelper
     hora.present? ? hora.strftime("%H:%M") : nil
   end
 
-  def item_menu(texto, caminho, controlador)
-    ativo = controller_name == controlador
-    link_to texto, caminho, class: ["menu-item", ("ativo" if ativo)].compact.join(" "),
-                            "aria-current": (ativo ? "page" : nil)
+  # Ícones simples (traço) desenhados em SVG, sem depender de biblioteca externa.
+  ICONES = {
+    inicio: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
+    agenda: '<rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
+    clientes: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.8a3.3 3.3 0 0 1 0 6.4M18.5 14.8c1.6.8 2.6 2.5 3 5.2"/>',
+    produtos: '<path d="M4 11h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 11c0-3.3 3.6-6 8-6s8 2.7 8 6"/><path d="M12 5V2.5M8 15h.01M12 16h.01M16 15h.01"/>',
+    ingredientes: '<path d="M7 3h10M8 3v4.5L4.5 19a1.5 1.5 0 0 0 1.4 2h12.2a1.5 1.5 0 0 0 1.4-2L16 7.5V3"/><path d="M6.5 14h11"/>',
+    enderecos: '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+    usuarios: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.2-6 8-6s7 2 8 6"/>',
+    mais: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+    sair: '<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 8l-4 4 4 4M6 12h10"/>',
+    mais_item: '<path d="M12 5v14M5 12h14"/>',
+    alerta: '<path d="M12 3 2.5 20h19z"/><path d="M12 10v4.5M12 17.5h.01"/>',
+    seta: '<path d="M9 5l7 7-7 7"/>',
+    whatsapp: '<path d="M4 20l1.3-3.9A8 8 0 1 1 8 18.9z"/><path d="M9 9.5c.3 2 2.5 4.3 4.6 4.8l1.2-1.2 2 .9c-.2 1-1 1.7-2 1.7-3.6 0-6.8-3.2-6.8-6.8 0-1 .7-1.8 1.7-2l.9 2z"/>'
+  }.freeze
+
+  def icone(nome, classe: "icone")
+    caminho = ICONES.fetch(nome)
+    tag.svg(caminho.html_safe, class: classe, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+                               "stroke-width": "1.8", "stroke-linecap": "round", "stroke-linejoin": "round",
+                               "aria-hidden": "true", focusable: "false")
+  end
+
+  def saudacao
+    hora = Time.current.hour
+    if hora < 12 then "Bom dia"
+    elsif hora < 18 then "Boa tarde"
+    else "Boa noite"
+    end
+  end
+
+  SECOES_MAIS = %w[enderecos ingredientes usuarios].freeze
+
+  def menu_ativo?(chave)
+    case chave
+    when "painel" then controller_name == "painel" && action_name == "index"
+    when "mais" then (controller_name == "painel" && action_name == "mais") || SECOES_MAIS.include?(controller_name)
+    else controller_name == chave
+    end
+  end
+
+  def item_menu(texto, caminho, chave, icone_nome, classe: "menu-item")
+    ativo = menu_ativo?(chave)
+    link_to caminho, class: [classe, ("ativo" if ativo)].compact.join(" "), "aria-current": (ativo ? "page" : nil) do
+      safe_join([icone(icone_nome), tag.span(texto)])
+    end
   end
 end
