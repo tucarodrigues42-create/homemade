@@ -16,14 +16,12 @@
     <%= progresso_status(pedido) %>
     <div class="selos"><%= selo_entrega(pedido) %><%= selo_pagamento(pedido) %></div>
   </div>
-  <% if pedido.proximo_status || (!pedido.pago? && !pedido.cancelado?) %>
-    <div class="pedido-acoes">
-      <%= botao_avancar(pedido) %>
-      <% unless pedido.pago? || pedido.cancelado? %>
-        <%= button_to pagamento_pedido_path(pedido, valor: "pago"), method: :patch, class: "botao botao-pagar", form: { class: "form-inline" } do %>
-          <span>Marcar pago</span>
-        <% end %>
+  <div class="pedido-acoes">
+    <%= render "pedidos/escolher_status", pedido: pedido %>
+    <% unless pedido.pago? || pedido.cancelado? %>
+      <%= button_to pagamento_pedido_path(pedido, valor: "pago"), method: :patch, class: "botao botao-pagar", form: { class: "form-inline" } do %>
+        <span>Marcar pago</span>
       <% end %>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 </li>

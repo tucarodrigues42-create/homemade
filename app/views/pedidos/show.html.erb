@@ -17,7 +17,7 @@
 
   <% if @pedido.cancelado? %>
     <p class="discreto">Este pedido foi cancelado e não entra na produção nem no faturamento.</p>
-    <%= button_to "Reabrir pedido", status_pedido_path(@pedido, status: "novo"), method: :patch, class: "botao botao-largo" %>
+    <%= render "pedidos/escolher_status", pedido: @pedido, classe: "escolher-status-largo" %>
   <% else %>
     <ol class="linha-etapas">
       <% Pedido::FLUXO.each_with_index do |st, i| %>
@@ -32,11 +32,11 @@
         </li>
       <% end %>
     </ol>
-    <%= botao_avancar(@pedido, classe: "botao-largo botao-grande") %>
+    <%= render "pedidos/escolher_status", pedido: @pedido, classe: "escolher-status-largo" %>
     <% if @pedido.status == "entregue" %>
       <p class="tudo-certo">Pedido concluído<%= " e pago" if @pedido.pago? %>.</p>
     <% end %>
-    <p class="discreto dica">Tocou errado? Toque na etapa certa na linha acima.</p>
+    <p class="discreto dica">Toque no botão acima (ou numa bolinha) e escolha a etapa.</p>
   <% end %>
 
   <div class="pagamento-escolha" role="group" aria-label="Pagamento">
@@ -51,10 +51,6 @@
     </div>
   </div>
 
-  <% unless @pedido.cancelado? %>
-    <%= button_to "Cancelar pedido", status_pedido_path(@pedido, status: "cancelado"), method: :patch,
-                  class: "link-perigo", form: { class: "form-bloco etapas-cancelar", onsubmit: "return confirm('Cancelar este pedido? Ele sai da produção do dia.');" } %>
-  <% end %>
 </section>
 
 <div class="colunas">

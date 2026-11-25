@@ -859,3 +859,49 @@ input[type="file"].visualmente-oculto:focus + * { outline: none; }
 }
 @media (prefers-reduced-motion: reduce) { .aviso-flutuante { animation: aviso-some-sem-movimento 9s step-end forwards; } }
 @keyframes aviso-some-sem-movimento { 100% { visibility: hidden; } }
+
+/* ---------- Botão de etapa: toque e escolha ---------- */
+.escolher-status-novo, .opcao-status-novo { --st-cor: var(--st-novo); }
+.escolher-status-confirmado, .opcao-status-confirmado { --st-cor: var(--st-confirmado); }
+.escolher-status-em_producao, .opcao-status-em_producao { --st-cor: var(--st-em_producao); }
+.escolher-status-pronto, .opcao-status-pronto { --st-cor: var(--st-pronto); }
+.escolher-status-entregue, .opcao-status-entregue { --st-cor: var(--st-entregue); }
+.escolher-status-cancelado, .opcao-status-cancelado { --st-cor: var(--st-cancelado); }
+
+.pedido-acoes { flex-wrap: wrap; align-items: flex-start; }
+.escolher-status { flex: 1 1 200px; min-width: 0; }
+.escolher-status-largo { flex-basis: 100%; }
+.escolher-status-botao {
+  list-style: none; width: 100%; min-height: 52px; justify-content: flex-start; gap: 10px;
+  background: var(--st-cor); border-color: transparent; color: #fff; padding: 6px 14px;
+}
+.escolher-status-botao::-webkit-details-marker { display: none; }
+.escolher-status-botao:hover { color: #fff; border-color: transparent; filter: brightness(.94); }
+.escolher-status-botao .escolher-status-bolinha { background: #fff; box-shadow: none; }
+.escolher-status-texto { display: grid; text-align: left; line-height: 1.15; font-size: 1.02rem; font-weight: 700; flex: 1; }
+.escolher-status-texto small { font-size: .72rem; font-weight: 600; opacity: .85; text-transform: uppercase; letter-spacing: .04em; }
+.escolher-status-seta { font-size: 1.1rem; transition: transform .15s ease; }
+.escolher-status[open] .escolher-status-seta { transform: rotate(180deg); }
+.escolher-status[open] .escolher-status-botao { border-radius: 10px 10px 0 0; }
+.escolher-status-bolinha { width: 12px; height: 12px; border-radius: 999px; background: var(--st-cor); flex: 0 0 auto; }
+
+.escolher-status-opcoes {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px;
+  background: var(--fundo); border: 2px solid var(--st-cor); border-top: 0; border-radius: 0 0 12px 12px;
+  animation: abrir-opcoes .12s ease-out;
+}
+@keyframes abrir-opcoes { from { opacity: 0; transform: translateY(-4px); } }
+.opcao-status {
+  width: 100%; min-height: 48px; display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: #fff; border: 1px solid var(--borda); border-radius: 10px; font: inherit; font-weight: 700;
+  color: var(--texto); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease, border-color .12s ease;
+}
+.opcao-status span:not(.escolher-status-bolinha) { flex: 1; }
+.opcao-status:hover { border-color: var(--st-cor); }
+.opcao-status:active { transform: scale(.97); }
+.opcao-status .icone { width: 18px; height: 18px; color: var(--st-cor); }
+.opcao-status-atual, .opcao-status[disabled] { opacity: 1; cursor: default; border: 2px solid var(--st-cor); background: color-mix(in srgb, var(--st-cor) 10%, #fff); color: var(--st-cor); }
+.opcao-status-cancelado { color: var(--erro); }
+.pedido .progresso-nome { display: none; } /* o botão de etapa já mostra o nome */
+.opcao-status { font-size: .95rem; line-height: 1.2; }

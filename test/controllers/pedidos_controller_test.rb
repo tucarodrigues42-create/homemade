@@ -103,9 +103,14 @@ class PedidosControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", status_pedido_path(pedido, status: "novo")
   end
 
-  test "cartão mostra o botão da próxima etapa e o de pagamento" do
+  test "cartão tem o botão de escolher a etapa e o de pagamento" do
+    pedido = pedidos(:maria_hoje)
     get pedidos_url(periodo: "dia", dia: Date.current)
-    assert_select ".botao-etapa", text: /Confirmar pedido/
+    assert_select ".pedido-novo .escolher-status-botao", text: /Novo/
+    # Ao tocar, aparecem todas as 6 etapas para escolher (a atual fica marcada)
+    assert_select ".pedido-novo .opcao-status", 6
+    assert_select ".pedido-novo .opcao-status-atual", 1
+    assert_select "form[action=?]", status_pedido_path(pedido, status: "pronto")
     assert_select ".botao-pagar", minimum: 1
   end
 

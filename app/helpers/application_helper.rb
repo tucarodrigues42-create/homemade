@@ -95,15 +95,6 @@ module ApplicationHelper
     end
   end
 
-  # Botão grande "próxima etapa", com a cor da etapa para onde o pedido vai.
-  def botao_avancar(pedido, classe: "")
-    return unless (proximo = pedido.proximo_status)
-    button_to status_pedido_path(pedido, status: proximo), method: :patch,
-              class: "botao botao-etapa botao-etapa-#{proximo} #{classe}", form: { class: "form-inline" } do
-      safe_join([icone(:check), tag.span(pedido.acao_proximo)])
-    end
-  end
-
   def selo_status(pedido)
     tag.span(pedido.status_nome, class: "selo selo-#{pedido.status}")
   end
