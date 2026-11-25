@@ -10,6 +10,7 @@ entrega, os produtos e os ingredientes. Funciona no navegador do celular ou do c
 
 - **Painel**: pedidos de hoje, valor a receber, produção do dia, pedidos da semana, agenda e alertas de validade e estoque.
 - **Pedidos**: cliente (cadastrado ou não), WhatsApp, entrega ou retirada com endereço, data e horário, itens escolhidos do cadastro de produtos ou escritos à mão (com quantidade, preço e observação), descrição longa, taxa de entrega, desconto e total automático. Etapas (novo → confirmado → em produção → pronto → entregue, ou cancelado) e pagamento (pago ou a receber) mudam com um toque. Busca por nome, WhatsApp, item ou número, filtros por dia, entrega/retirada, pagamento e etapa, e botão que manda o resumo do pedido no WhatsApp do cliente.
+- **Dashboard de faturamento** (menu Mais): faturamento de hoje, da semana e do mês, comparação com o mês anterior, ticket médio, recebido x a receber, gráfico de evolução por dias, semanas ou meses (com tabela) e produtos que mais vendem. Cancelados não entram.
 - **Produção do dia**: soma, produto por produto, tudo o que precisa ser feito nos pedidos do dia (cancelados ficam de fora), com opção de contar só o que falta entregar e de imprimir.
 - **Agenda**: compromissos com data, horário e descrição longa, agrupados por dia, com filtro por data e botão "Hoje".
 - **Clientes**: nome, WhatsApp (obrigatório), telefone fixo e e-mail opcionais, busca por nome ou número e botão que abre a conversa no WhatsApp.

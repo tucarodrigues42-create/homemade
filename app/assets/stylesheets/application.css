@@ -622,3 +622,65 @@ input:focus, select:focus, textarea:focus { border-color: var(--marca); outline:
   .conteudo { padding: 0; max-width: none; }
   .tabela-producao, .cartao, .numero { box-shadow: none; }
 }
+
+/* ---------- Dashboard de faturamento ---------- */
+:root { --serie-recebido: #9A4F35; --serie-a-receber: #E09A3C; }
+.aviso-faturamento { margin: -8px 0 14px; }
+.numero-valor-dinheiro { white-space: nowrap; }
+.numeros .numero-valor-dinheiro { font-size: clamp(1.25rem, 5vw, 1.6rem); }
+
+.ponto { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: 0; }
+.ponto-recebido { background: var(--serie-recebido); }
+.ponto-a-receber { background: var(--serie-a-receber); }
+
+.recebimento { margin-bottom: 20px; display: grid; gap: 10px; }
+.recebimento p { margin: 0; }
+.recebimento-linha { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+.recebimento-linha strong { margin-left: 4px; font-variant-numeric: tabular-nums; }
+.barra-recebimento { display: flex; gap: 2px; height: 12px; border-radius: 999px; background: var(--fundo); overflow: hidden; }
+.barra-recebido { background: var(--serie-recebido); }
+.barra-a-receber { background: var(--serie-a-receber); }
+
+.bloco-cabecalho-grafico { flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+.bloco-cabecalho-grafico .bloco-titulo { margin: 0; }
+.abas-pequenas { margin: 0; padding: 3px; }
+.abas-pequenas a { padding: 5px 12px; font-size: .88rem; }
+
+.grafico-cartao { display: grid; gap: 8px; }
+.grafico-resumo { margin: 0; }
+.legenda { display: flex; gap: 16px; font-size: .88rem; color: var(--texto-suave); }
+.grafico { position: relative; padding: 0 0 4px 58px; }
+.grafico-svg { display: block; width: 100%; height: 220px; overflow: visible; }
+.grafico-svg .grade { stroke: var(--borda); stroke-width: 1; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
+.grafico-svg .eixo { stroke: #CDB9AF; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.grafico-svg .alvo { fill: transparent; }
+.grafico-svg .serie-recebido { fill: var(--serie-recebido); }
+.grafico-svg .serie-a-receber { fill: var(--serie-a-receber); }
+.grafico-coluna { cursor: pointer; outline: none; transition: opacity .12s; }
+.grafico-coluna.apagada { opacity: .35; }
+.grafico-coluna:focus-visible .alvo { fill: var(--marca-clara); }
+.grafico-eixo-y { position: absolute; left: 0; top: 0; height: 220px; width: 52px; pointer-events: none; }
+.grafico-eixo-y span { position: absolute; right: 0; transform: translateY(-50%); font-size: .72rem; color: var(--texto-suave); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.grafico-eixo-x { display: flex; margin-top: 2px; }
+.grafico-eixo-x span { flex: 1; text-align: center; font-size: .72rem; color: var(--texto-suave); white-space: nowrap; overflow: visible; }
+.grafico-dica {
+  position: absolute; top: -6px; transform: translate(-50%, -100%);
+  background: var(--texto); color: #fff; border-radius: 10px; padding: 8px 12px;
+  font-size: .85rem; display: grid; gap: 1px; min-width: 200px; white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,.18); z-index: 4; pointer-events: none;
+}
+.grafico-dica strong { font-size: .9rem; }
+.tabela-grafico summary { cursor: pointer; font-weight: 600; color: var(--marca-escura); padding: 6px 0; }
+.tabela-grafico table { margin-top: 6px; }
+.tabela-grafico th { text-align: left; font-size: .85rem; color: var(--texto-suave); padding: 6px 4px; border-bottom: 1px solid var(--borda); }
+.tabela-grafico th.num { text-align: right; }
+
+.ranking { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ranking li { display: flex; gap: 12px; align-items: center; padding: 10px 14px; background: var(--cartao); border: 1px solid var(--borda); border-radius: 12px; }
+.ranking-posicao { flex: 0 0 28px; height: 28px; border-radius: 999px; background: var(--marca-clara); color: var(--marca-escura); font-weight: 700; display: grid; place-items: center; font-size: .9rem; }
+.ranking-corpo { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.ranking-topo { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+.ranking-nome { font-weight: 600; overflow-wrap: anywhere; }
+.ranking-valor { color: var(--texto-suave); font-size: .92rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ranking-valor strong { color: var(--texto); }
+.ranking-trilho { height: 6px; background: var(--fundo); border-radius: 999px; overflow: hidden; }
+.ranking-trilho span { display: block; height: 100%; background: var(--serie-recebido); border-radius: 999px; }

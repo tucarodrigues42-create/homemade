@@ -30,12 +30,11 @@
             <%= item_menu "Início", root_path, "painel", :inicio %>
             <%= item_menu "Pedidos", pedidos_path(periodo: "proximos"), "pedidos", :pedidos %>
             <%= item_menu "Produção", producao_path, "producao", :producao %>
+            <%= item_menu "Dashboard", dashboard_path, "dashboard", :grafico %>
             <%= item_menu "Agenda", agendas_path, "agendas", :agenda %>
             <%= item_menu "Clientes", clientes_path, "clientes", :clientes %>
             <%= item_menu "Produtos", produtos_path, "produtos", :produtos %>
-            <%= item_menu "Ingredientes", ingredientes_path, "ingredientes", :ingredientes %>
-            <%= item_menu "Endereços", enderecos_path, "enderecos", :enderecos %>
-            <%= item_menu "Usuários", usuarios_path, "usuarios", :usuarios %>
+            <%= item_menu "Mais", mais_path, "mais_topo", :mais %>
           </nav>
           <%= button_to sessions_path, method: :delete, class: "botao-sair", form: { class: "form-inline" }, "aria-label": "Sair do sistema" do %>
             <%= icone(:sair) %><span>Sair</span>

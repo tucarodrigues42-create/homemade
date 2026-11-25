@@ -1,6 +1,7 @@
 <% content_for :title, "Mais" %>
 <%= render "shared/cabecalho", titulo: "Mais opções" %>
 <ul class="lista-menu">
+  <li><%= link_to dashboard_path, class: "lista-menu-item" do %><%= icone(:grafico) %><span>Dashboard de faturamento</span><%= icone(:seta, classe: "icone seta") %><% end %></li>
   <li><%= link_to agendas_path, class: "lista-menu-item" do %><%= icone(:agenda) %><span>Agenda</span><%= icone(:seta, classe: "icone seta") %><% end %></li>
   <li><%= link_to produtos_path, class: "lista-menu-item" do %><%= icone(:produtos) %><span>Produtos</span><%= icone(:seta, classe: "icone seta") %><% end %></li>
   <li><%= link_to enderecos_path, class: "lista-menu-item" do %><%= icone(:enderecos) %><span>Endereços de entrega</span><%= icone(:seta, classe: "icone seta") %><% end %></li>

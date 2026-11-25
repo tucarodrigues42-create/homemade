@@ -37,6 +37,7 @@ module ApplicationHelper
     seta: '<path d="M9 5l7 7-7 7"/>',
     pedidos: '<path d="M6 3h12l1 4H5z"/><path d="M5 7h14v12.5A1.5 1.5 0 0 1 17.5 21h-11A1.5 1.5 0 0 1 5 19.5z"/><path d="M9 11h6M9 15h4"/>',
     producao: '<path d="M6 13.5a6 6 0 0 1 12 0"/><path d="M3 13.5h18M5 17h14l-1 4H6z"/><path d="M12 4v3.5M8.5 5.5l1 2.5M15.5 5.5l-1 2.5"/>',
+    grafico: '<path d="M4 20V4M4 20h16"/><path d="M8 16v-5M12 16V8M16 16v-3M20 16V6"/>',
     whatsapp: '<path d="M4 20l1.3-3.9A8 8 0 1 1 8 18.9z"/><path d="M9 9.5c.3 2 2.5 4.3 4.6 4.8l1.2-1.2 2 .9c-.2 1-1 1.7-2 1.7-3.6 0-6.8-3.2-6.8-6.8 0-1 .7-1.8 1.7-2l.9 2z"/>'
   }.freeze
 
@@ -55,13 +56,14 @@ module ApplicationHelper
     end
   end
 
-  SECOES_MAIS = %w[agendas produtos enderecos ingredientes usuarios].freeze
+  SECOES_MAIS = %w[dashboard agendas produtos enderecos ingredientes usuarios].freeze
 
   def menu_ativo?(chave)
     case chave
     when "painel" then controller_name == "painel" && action_name == "index"
     when "pedidos" then controller_name == "pedidos" && action_name != "producao"
     when "producao" then controller_name == "pedidos" && action_name == "producao"
+    when "mais_topo" then (controller_name == "painel" && action_name == "mais") || %w[enderecos ingredientes usuarios].include?(controller_name)
     when "mais" then (controller_name == "painel" && action_name == "mais") || SECOES_MAIS.include?(controller_name)
     else controller_name == chave
     end
@@ -107,5 +109,26 @@ module ApplicationHelper
   def whatsapp_pedido_url(pedido)
     return unless pedido.whatsapp_url
     "#{pedido.whatsapp_url}?text=#{ERB::Util.url_encode(mensagem_whatsapp(pedido))}"
+  end
+
+  # Valor curto para eixos: R$ 1,2 mil
+  def reais_curto(valor)
+    valor = valor.to_d
+    return "R$ 0" if valor.zero?
+    return "R$ #{number_with_precision(valor / 1000, precision: (valor >= 10_000 ? 0 : 1), separator: ',', strip_insignificant_zeros: true)} mil" if valor >= 1000
+    "R$ #{number_with_precision(valor, precision: 0, delimiter: '.')}"
+  end
+
+  # Marca "bonita" para o topo do eixo (1, 2, 2,5 ou 5 × 10^n).
+  def topo_do_eixo(maximo)
+    maximo = maximo.to_f
+    return 100 if maximo <= 0
+    base = 10**Math.log10(maximo).floor
+    [1, 2, 2.5, 5, 10].map { |m| m * base }.find { |v| v >= maximo }
+  end
+
+  def variacao_percentual(atual, anterior)
+    return nil if anterior.to_d.zero?
+    ((atual.to_d - anterior.to_d) / anterior.to_d * 100).round
   end
 end
