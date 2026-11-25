@@ -1,0 +1,41 @@
+<%= form_with model: endereco, local: true, class: "formulario cartao" do |form| %>
+  <%= render "shared/erros", registro: endereco %>
+  <div class="linha">
+    <div class="campo campo-grande">
+      <%= form.label :rua %>
+      <%= form.text_field :rua, required: true %>
+    </div>
+    <div class="campo campo-pequeno">
+      <%= form.label :numero %>
+      <%= form.text_field :numero, inputmode: "numeric", required: true %>
+    </div>
+  </div>
+  <div class="linha">
+    <div class="campo">
+      <%= form.label :bairro %>
+      <%= form.text_field :bairro, required: true %>
+    </div>
+    <div class="campo">
+      <%= form.label :cep %>
+      <%= form.text_field :cep, value: endereco.cep_formatado, placeholder: "57300-000", inputmode: "numeric" %>
+    </div>
+  </div>
+  <div class="linha">
+    <div class="campo campo-grande">
+      <%= form.label :cidade %>
+      <%= form.text_field :cidade, required: true %>
+    </div>
+    <div class="campo campo-pequeno">
+      <%= form.label :estado %>
+      <%= form.text_field :estado, maxlength: 2, required: true %>
+    </div>
+  </div>
+  <div class="campo">
+    <%= form.label :complemento %>
+    <%= form.text_field :complemento %>
+  </div>
+  <div class="acoes">
+    <%= form.submit "Salvar", class: "botao botao-principal" %>
+    <%= link_to "Cancelar", enderecos_path, class: "botao" %>
+  </div>
+<% end %>

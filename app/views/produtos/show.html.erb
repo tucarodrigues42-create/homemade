@@ -1,0 +1,35 @@
+<% content_for :title, @produto.nome %>
+<%= render "shared/cabecalho", titulo: @produto.nome %>
+<dl class="cartao detalhes">
+  <dt>Preço</dt><dd><%= reais(@produto.preco) %></dd>
+  <dt>Em estoque</dt><dd><%= @produto.quantidade %></dd>
+  <dt>Fabricação</dt><dd><%= data_br(@produto.fabricacao) %></dd>
+  <dt>Validade</dt>
+  <dd class="<%= "alerta" if @produto.vencido? %>"><%= data_br(@produto.vencimento) %><%= " (vencido)" if @produto.vencido? %></dd>
+  <dt>Descrição</dt><dd class="texto-longo"><%= @produto.descricao %></dd>
+</dl>
+
+<div class="cabecalho cabecalho-secundario">
+  <h2>Ingredientes</h2>
+  <%= link_to "+ Ingrediente", new_ingrediente_path(produto_id: @produto.id), class: "botao" %>
+</div>
+<% if @produto.ingredientes.empty? %>
+  <p class="vazio">Nenhum ingrediente cadastrado para este produto.</p>
+<% else %>
+  <ul class="lista">
+    <% @produto.ingredientes.em_ordem.each do |ingrediente| %>
+      <li class="cartao item">
+        <div class="item-texto">
+          <h3 class="item-titulo"><%= link_to ingrediente.nome, ingrediente %></h3>
+          <p class="discreto"><%= ingrediente.quantidade %> em estoque · <%= reais(ingrediente.preco) %></p>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<div class="acoes">
+  <%= link_to "Editar", edit_produto_path(@produto), class: "botao botao-principal" %>
+  <%= link_to "Voltar", produtos_path, class: "botao" %>
+  <%= botao_excluir @produto, pergunta: "Excluir #{@produto.nome} e os ingredientes dele?" %>
+</div>

@@ -1,0 +1,76 @@
+pt-BR:
+  activerecord:
+    models:
+      agenda: { one: "Compromisso", other: "Agenda" }
+      cliente: { one: "Cliente", other: "Clientes" }
+      endereco: { one: "Endereço", other: "Endereços" }
+      produto: { one: "Produto", other: "Produtos" }
+      ingrediente: { one: "Ingrediente", other: "Ingredientes" }
+      usuario: { one: "Usuário", other: "Usuários" }
+      pedido: { one: "Pedido", other: "Pedidos" }
+      pedido_item: { one: "Item do pedido", other: "Itens do pedido" }
+    attributes:
+      agenda:
+        mensagem: "Descrição"
+        data: "Data"
+        horario: "Horário"
+      cliente:
+        nome: "Nome"
+        telefone: "Telefone fixo"
+        celular: "WhatsApp"
+        email: "E-mail"
+        endereco: "Endereço"
+      endereco:
+        rua: "Rua"
+        numero: "Número"
+        bairro: "Bairro"
+        cidade: "Cidade"
+        cep: "CEP"
+        estado: "Estado"
+        complemento: "Complemento / ponto de referência"
+      produto:
+        nome: "Nome"
+        descricao: "Descrição"
+        fabricacao: "Fabricação"
+        vencimento: "Validade"
+        quantidade: "Quantidade em estoque"
+        preco: "Preço (R$)"
+        ingredientes: "Ingredientes"
+      ingrediente:
+        nome: "Nome"
+        descricao: "Descrição"
+        preco: "Preço (R$)"
+        quantidade: "Quantidade em estoque"
+        vencimento: "Validade"
+        produto: "Produto"
+      usuario:
+        email: "E-mail"
+        password: "Senha"
+        password_confirmation: "Confirme a senha"
+        adm: "Administrador"
+      pedido:
+        cliente: "Cliente cadastrado"
+        nome_cliente: "Nome do cliente"
+        whatsapp: "WhatsApp"
+        tipo_entrega: "Entrega ou retirada"
+        endereco_entrega: "Endereço de entrega"
+        data: "Data"
+        horario: "Horário"
+        status: "Etapa"
+        pagamento: "Pagamento"
+        forma_pagamento: "Forma de pagamento"
+        taxa_entrega: "Taxa de entrega (R$)"
+        desconto: "Desconto (R$)"
+        total: "Total"
+        descricao: "Descrição do pedido"
+        itens: "Itens"
+      pedido_item:
+        produto: "Produto"
+        nome: "Item"
+        quantidade: "Quantidade"
+        preco_unitario: "Preço unitário (R$)"
+        observacao: "Observação"
+      pedido/itens:
+        nome: "Item"
+        quantidade: "Quantidade do item"
+        preco_unitario: "Preço do item"

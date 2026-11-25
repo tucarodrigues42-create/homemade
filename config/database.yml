@@ -1,0 +1,23 @@
+# No computador o sistema usa SQLite (arquivo em storage/).
+# No servidor usa PostgreSQL, configurado pela variável DATABASE_URL.
+default: &default
+  adapter: sqlite3
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+
+development:
+  <<: *default
+  database: storage/development.sqlite3
+
+test:
+  <<: *default
+  database: storage/test.sqlite3
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  url: <%= ENV["DATABASE_URL"] %>
+  # O Neon usa um "pooler" de conexões; estas opções evitam erros com ele.
+  prepared_statements: false
+  advisory_locks: false

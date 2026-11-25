@@ -1,0 +1,22 @@
+<% content_for :title, "Produtos" %>
+<%= render "shared/cabecalho", titulo: "Produtos", botao_texto: "+ Novo produto", botao_caminho: new_produto_path %>
+<% if @produtos.empty? %>
+  <p class="vazio">Nenhum produto cadastrado ainda.</p>
+<% else %>
+  <ul class="lista">
+    <% @produtos.each do |produto| %>
+      <li class="cartao item">
+        <div class="item-texto">
+          <h2 class="item-titulo"><%= link_to produto.nome, produto %></h2>
+          <p class="discreto">
+            <%= reais(produto.preco) %> · <%= produto.quantidade %> em estoque ·
+            <span class="<%= "alerta" if produto.vencido? %>">validade <%= data_br(produto.vencimento) %></span>
+          </p>
+        </div>
+        <div class="item-acoes">
+          <%= link_to "Editar", edit_produto_path(produto), class: "botao" %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

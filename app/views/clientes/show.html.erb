@@ -1,0 +1,27 @@
+<% content_for :title, @cliente.nome %>
+<%= render "shared/cabecalho", titulo: @cliente.nome %>
+<dl class="cartao detalhes">
+  <dt>WhatsApp</dt>
+  <dd><%= link_to @cliente.celular_formatado, @cliente.whatsapp_url, target: "_blank", rel: "noopener" %></dd>
+  <% if @cliente.telefone.present? %>
+    <dt>Telefone fixo</dt><dd><%= @cliente.telefone_formatado %></dd>
+  <% end %>
+  <% if @cliente.email.present? %>
+    <dt>E-mail</dt><dd><%= mail_to @cliente.email %></dd>
+  <% end %>
+  <dt>Endereço</dt>
+  <dd>
+    <% if @cliente.endereco %>
+      <%= @cliente.endereco.resumo %><br>
+      <%= @cliente.endereco.cidade %> – <%= @cliente.endereco.estado %> <%= @cliente.endereco.cep_formatado %>
+    <% else %>
+      Retira na loja
+    <% end %>
+  </dd>
+</dl>
+<div class="acoes">
+  <%= link_to "Abrir WhatsApp", @cliente.whatsapp_url, class: "botao botao-whatsapp", target: "_blank", rel: "noopener" %>
+  <%= link_to "Editar", edit_cliente_path(@cliente), class: "botao botao-principal" %>
+  <%= link_to "Voltar", clientes_path, class: "botao" %>
+  <%= botao_excluir @cliente, pergunta: "Excluir o cliente #{@cliente.nome}?" %>
+</div>

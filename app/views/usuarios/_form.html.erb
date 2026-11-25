@@ -1,0 +1,26 @@
+<%= form_with model: usuario, local: true, class: "formulario cartao" do |form| %>
+  <%= render "shared/erros", registro: usuario %>
+  <div class="campo">
+    <%= form.label :email %>
+    <%= form.email_field :email, required: true, autocomplete: "off" %>
+  </div>
+  <div class="campo">
+    <%= form.label :password %>
+    <%= form.password_field :password, autocomplete: "new-password", required: usuario.new_record?,
+                            placeholder: (usuario.persisted? ? "Deixe em branco para manter a atual" : "Mínimo de 6 caracteres") %>
+  </div>
+  <div class="campo">
+    <%= form.label :password_confirmation %>
+    <%= form.password_field :password_confirmation, autocomplete: "new-password", required: usuario.new_record? %>
+  </div>
+  <% if current_user.adm? && current_user != usuario %>
+    <div class="campo campo-check">
+      <%= form.check_box :adm %>
+      <%= form.label :adm, "Administrador (pode cadastrar e remover usuários)" %>
+    </div>
+  <% end %>
+  <div class="acoes">
+    <%= form.submit "Salvar", class: "botao botao-principal" %>
+    <%= link_to "Cancelar", usuarios_path, class: "botao" %>
+  </div>
+<% end %>

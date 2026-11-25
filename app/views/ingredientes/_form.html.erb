@@ -1,0 +1,37 @@
+<% if @produtos.empty? %>
+  <p class="aviso aviso-erro">Cadastre um produto antes de adicionar ingredientes. <%= link_to "Cadastrar produto", new_produto_path %></p>
+<% else %>
+  <%= form_with model: ingrediente, local: true, class: "formulario cartao" do |form| %>
+    <%= render "shared/erros", registro: ingrediente %>
+    <div class="campo">
+      <%= form.label :produto_id, "Produto" %>
+      <%= form.select :produto_id, @produtos, { include_blank: "Escolha o produto" }, required: true %>
+    </div>
+    <div class="campo">
+      <%= form.label :nome %>
+      <%= form.text_field :nome, required: true, placeholder: "Ex.: Chocolate meio amargo" %>
+    </div>
+    <div class="campo">
+      <%= form.label :descricao %>
+      <%= form.text_area :descricao, rows: 3, required: true %>
+    </div>
+    <div class="linha">
+      <div class="campo">
+        <%= form.label :preco %>
+        <%= form.number_field :preco, step: "0.01", min: 0, inputmode: "decimal", required: true %>
+      </div>
+      <div class="campo">
+        <%= form.label :quantidade %>
+        <%= form.number_field :quantidade, min: 0, step: 1, inputmode: "numeric", required: true %>
+      </div>
+    </div>
+    <div class="campo">
+      <%= form.label :vencimento %>
+      <%= form.date_field :vencimento, required: true %>
+    </div>
+    <div class="acoes">
+      <%= form.submit "Salvar", class: "botao botao-principal" %>
+      <%= link_to "Cancelar", (ingrediente.produto || ingredientes_path), class: "botao" %>
+    </div>
+  <% end %>
+<% end %>

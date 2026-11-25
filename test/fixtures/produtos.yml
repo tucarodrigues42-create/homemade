@@ -1,0 +1,15 @@
+panetone:
+  nome: Panetone trufado 500g
+  descricao: Panetone com recheio de trufa de chocolate
+  fabricacao: <%= Date.current %>
+  vencimento: <%= Date.current + 20 %>
+  quantidade: 10
+  preco: 59.90
+
+bolo:
+  nome: Bolo de Natal 1kg
+  descricao: Bolo de frutas
+  fabricacao: <%= Date.current %>
+  vencimento: <%= Date.current + 7 %>
+  quantidade: 4
+  preco: 80.00

@@ -1,0 +1,36 @@
+_fixture:
+  model_class: PedidoItem
+
+maria_panetone:
+  pedido: maria_hoje
+  produto: panetone
+  nome: Panetone trufado 500g
+  quantidade: 2
+  preco_unitario: 59.90
+
+maria_bolo:
+  pedido: maria_hoje
+  produto: bolo
+  nome: Bolo de Natal 1kg
+  quantidade: 1
+  preco_unitario: 80.00
+
+joao_panetone:
+  pedido: joao_hoje
+  produto: panetone
+  nome: Panetone trufado 500g
+  quantidade: 1
+  preco_unitario: 59.90
+
+joao_avulso:
+  pedido: joao_hoje
+  nome: Brigadeiro gourmet
+  quantidade: 25
+  preco_unitario: 0
+
+cancelado_bolo:
+  pedido: cancelado_hoje
+  produto: bolo
+  nome: Bolo de Natal 1kg
+  quantidade: 1
+  preco_unitario: 80.00

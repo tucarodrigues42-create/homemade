@@ -1,0 +1,28 @@
+<% content_for :title, "Clientes" %>
+<%= render "shared/cabecalho", titulo: "Clientes", botao_texto: "+ Novo cliente", botao_caminho: new_cliente_path %>
+
+<%= form_with url: clientes_path, method: :get, local: true, class: "filtro" do |form| %>
+  <%= form.label :busca, "Buscar cliente", class: "visualmente-oculto" %>
+  <%= form.search_field :busca, value: @busca, placeholder: "Buscar por nome ou WhatsApp" %>
+  <%= form.submit "Buscar", class: "botao", name: nil %>
+  <% if @busca.present? %><%= link_to "Limpar", clientes_path, class: "botao" %><% end %>
+<% end %>
+
+<% if @clientes.empty? %>
+  <p class="vazio"><%= @busca.present? ? "Nenhum cliente encontrado." : "Nenhum cliente cadastrado ainda." %></p>
+<% else %>
+  <ul class="lista">
+    <% @clientes.each do |cliente| %>
+      <li class="cartao item">
+        <div class="item-texto">
+          <h2 class="item-titulo"><%= link_to cliente.nome, cliente %></h2>
+          <p class="discreto"><%= cliente.celular_formatado %><% if cliente.endereco %> · <%= cliente.endereco.bairro %><% else %> · Retira na loja<% end %></p>
+        </div>
+        <div class="item-acoes">
+          <%= link_to "WhatsApp", cliente.whatsapp_url, class: "botao botao-whatsapp", target: "_blank", rel: "noopener" %>
+          <%= link_to "Editar", edit_cliente_path(cliente), class: "botao" %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

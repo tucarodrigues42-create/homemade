@@ -1,0 +1,22 @@
+<% content_for :title, "Endereços" %>
+<%= render "shared/cabecalho", titulo: "Endereços", botao_texto: "+ Novo endereço", botao_caminho: new_endereco_path %>
+<% if @enderecos.empty? %>
+  <p class="vazio">Nenhum endereço cadastrado ainda.</p>
+<% else %>
+  <ul class="lista">
+    <% @enderecos.each do |endereco| %>
+      <li class="cartao item">
+        <div class="item-texto">
+          <h2 class="item-titulo"><%= link_to endereco.resumo, endereco %></h2>
+          <p class="discreto">
+            <%= endereco.cidade %> – <%= endereco.estado %>
+            <% if endereco.clientes.any? %> · <%= endereco.clientes.map(&:nome).to_sentence %><% end %>
+          </p>
+        </div>
+        <div class="item-acoes">
+          <%= link_to "Editar", edit_endereco_path(endereco), class: "botao" %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

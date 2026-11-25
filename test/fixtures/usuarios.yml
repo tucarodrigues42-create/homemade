@@ -1,0 +1,9 @@
+admin:
+  email: admin@homemade.com
+  password_digest: <%= BCrypt::Password.create("senha123", cost: BCrypt::Engine::MIN_COST) %>
+  adm: true
+
+equipe:
+  email: equipe@homemade.com
+  password_digest: <%= BCrypt::Password.create("senha123", cost: BCrypt::Engine::MIN_COST) %>
+  adm: false

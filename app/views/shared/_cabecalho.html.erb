@@ -1,0 +1,6 @@
+<div class="cabecalho">
+  <h1><%= titulo %></h1>
+  <% if local_assigns[:botao_texto] %>
+    <%= link_to botao_texto, botao_caminho, class: "botao botao-principal" %>
+  <% end %>
+</div>

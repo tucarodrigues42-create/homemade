@@ -1,0 +1,18 @@
+<% content_for :title, "Endereço" %>
+<%= render "shared/cabecalho", titulo: "Endereço" %>
+<dl class="cartao detalhes">
+  <dt>Rua</dt><dd><%= @endereco.rua %>, <%= @endereco.numero %></dd>
+  <dt>Bairro</dt><dd><%= @endereco.bairro %></dd>
+  <dt>Cidade</dt><dd><%= @endereco.cidade %> – <%= @endereco.estado %></dd>
+  <% if @endereco.cep.present? %><dt>CEP</dt><dd><%= @endereco.cep_formatado %></dd><% end %>
+  <% if @endereco.complemento.present? %><dt>Complemento</dt><dd><%= @endereco.complemento %></dd><% end %>
+  <% if @endereco.clientes.any? %>
+    <dt>Clientes</dt>
+    <dd><%= safe_join(@endereco.clientes.map { |c| link_to(c.nome, c) }, ", ") %></dd>
+  <% end %>
+</dl>
+<div class="acoes">
+  <%= link_to "Editar", edit_endereco_path(@endereco), class: "botao botao-principal" %>
+  <%= link_to "Voltar", enderecos_path, class: "botao" %>
+  <%= botao_excluir @endereco %>
+</div>

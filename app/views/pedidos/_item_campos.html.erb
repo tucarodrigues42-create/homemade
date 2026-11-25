@@ -1,0 +1,32 @@
+<div class="item-pedido" data-item>
+  <%= f.hidden_field :id if f.object.persisted? %>
+  <div class="item-pedido-produto campo">
+    <%= f.label :produto_id, "Produto" %>
+    <%= f.select :produto_id,
+          options_for_select(produtos.map { |p| [p.nome, p.id, { "data-valor": p.preco.to_s }] }, f.object.produto_id),
+          { include_blank: "— Escolher produto —" }, data: { produto: true } %>
+  </div>
+  <div class="item-pedido-nome campo">
+    <%= f.label :nome, "Ou escreva o item" %>
+    <%= f.text_field :nome, placeholder: "Ex.: Bolo de pote de Ninho", data: { nome: true } %>
+  </div>
+  <div class="item-pedido-qtd campo">
+    <%= f.label :quantidade, "Qtd." %>
+    <%= f.number_field :quantidade, min: 1, step: 1, inputmode: "numeric", value: f.object.quantidade || 1, data: { qtd: true } %>
+  </div>
+  <div class="item-pedido-preco campo">
+    <%= f.label :preco_unitario, "Preço un. (R$)" %>
+    <%= f.number_field :preco_unitario, min: 0, step: "0.01", inputmode: "decimal", value: (f.object.preco_unitario if f.object.preco_unitario.to_d.positive? || f.object.persisted?), placeholder: "0,00", data: { preco: true } %>
+  </div>
+  <div class="item-pedido-obs campo">
+    <%= f.label :observacao, "Observação" %>
+    <%= f.text_field :observacao, placeholder: "Ex.: escrever “Feliz Natal”" %>
+  </div>
+  <div class="item-pedido-remover">
+    <% if f.object.persisted? %>
+      <label class="campo-check"><%= f.check_box :_destroy, data: { remover: true } %> Remover</label>
+    <% else %>
+      <button type="button" class="botao botao-pequeno" data-limpar>Limpar</button>
+    <% end %>
+  </div>
+</div>

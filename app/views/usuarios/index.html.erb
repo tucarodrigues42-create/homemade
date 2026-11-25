@@ -1,0 +1,24 @@
+<% content_for :title, "Usuários" %>
+<% if current_user.adm? %>
+  <%= render "shared/cabecalho", titulo: "Usuários", botao_texto: "+ Novo usuário", botao_caminho: new_usuario_path %>
+<% else %>
+  <%= render "shared/cabecalho", titulo: "Usuários" %>
+<% end %>
+<ul class="lista">
+  <% @usuarios.each do |usuario| %>
+    <li class="cartao item">
+      <div class="item-texto">
+        <h2 class="item-titulo"><%= link_to usuario.email, usuario %></h2>
+        <p class="discreto"><%= usuario.adm? ? "Administrador" : "Equipe" %><%= " · você" if usuario == current_user %></p>
+      </div>
+      <div class="item-acoes">
+        <% if current_user.adm? || usuario == current_user %>
+          <%= link_to "Editar", edit_usuario_path(usuario), class: "botao" %>
+        <% end %>
+        <% if current_user.adm? && usuario != current_user %>
+          <%= botao_excluir usuario, pergunta: "Remover o acesso de #{usuario.email}?" %>
+        <% end %>
+      </div>
+    </li>
+  <% end %>
+</ul>

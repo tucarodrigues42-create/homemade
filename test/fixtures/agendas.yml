@@ -1,0 +1,8 @@
+entrega:
+  mensagem: Entregar 2 panetones trufados para Maria
+  data: <%= Date.current %>
+  horario: "15:00"
+
+encomenda:
+  mensagem: Bolo de Natal 1kg para João
+  data: <%= Date.current + 3 %>

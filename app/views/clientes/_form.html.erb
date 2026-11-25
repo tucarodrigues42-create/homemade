@@ -1,0 +1,66 @@
+<%= form_with model: cliente, local: true, class: "formulario cartao" do |form| %>
+  <%= render "shared/erros", registro: cliente %>
+  <div class="campo">
+    <%= form.label :nome %>
+    <%= form.text_field :nome, autocomplete: "off", required: true %>
+  </div>
+  <div class="linha">
+    <div class="campo">
+      <%= form.label :celular %>
+      <%= form.telephone_field :celular, value: cliente.celular_formatado.presence || cliente.celular, placeholder: "(82) 99999-9999", inputmode: "tel", required: true %>
+    </div>
+    <div class="campo">
+      <%= form.label :telefone %>
+      <%= form.telephone_field :telefone, value: cliente.telefone_formatado.presence || cliente.telefone, placeholder: "Opcional", inputmode: "tel" %>
+    </div>
+  </div>
+  <div class="campo">
+    <%= form.label :email %>
+    <%= form.email_field :email, placeholder: "Opcional" %>
+  </div>
+
+  <fieldset class="grupo">
+    <legend>Endereço de entrega <small>(deixe em branco se o cliente só retira)</small></legend>
+    <%= form.fields_for :endereco do |e| %>
+      <div class="linha">
+        <div class="campo campo-grande">
+          <%= e.label :rua %>
+          <%= e.text_field :rua %>
+        </div>
+        <div class="campo campo-pequeno">
+          <%= e.label :numero %>
+          <%= e.text_field :numero, inputmode: "numeric" %>
+        </div>
+      </div>
+      <div class="linha">
+        <div class="campo">
+          <%= e.label :bairro %>
+          <%= e.text_field :bairro %>
+        </div>
+        <div class="campo">
+          <%= e.label :cep %>
+          <%= e.text_field :cep, value: e.object&.cep_formatado, placeholder: "57300-000", inputmode: "numeric" %>
+        </div>
+      </div>
+      <div class="linha">
+        <div class="campo campo-grande">
+          <%= e.label :cidade %>
+          <%= e.text_field :cidade %>
+        </div>
+        <div class="campo campo-pequeno">
+          <%= e.label :estado %>
+          <%= e.text_field :estado, maxlength: 2 %>
+        </div>
+      </div>
+      <div class="campo">
+        <%= e.label :complemento %>
+        <%= e.text_field :complemento %>
+      </div>
+    <% end %>
+  </fieldset>
+
+  <div class="acoes">
+    <%= form.submit "Salvar", class: "botao botao-principal" %>
+    <%= link_to "Cancelar", (cliente.persisted? ? cliente : clientes_path), class: "botao" %>
+  </div>
+<% end %>

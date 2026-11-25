@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <title><%= [content_for(:title), "Homemade Confeitaria"].compact.join(" · ") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#BC6C50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Homemade">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" data-turbo-track="reload">
+    <meta name="turbo-refresh-method" content="morph">
+    <meta name="turbo-refresh-scroll" content="preserve">
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "turbo.min", type: "module", "data-turbo-track": "reload" %>
+  </head>
+
+  <body class="<%= "com-menu" if logged_in? %>">
+    <header class="topo">
+      <div class="topo-conteudo">
+        <%= link_to root_path, class: "marca", "aria-label": "Homemade Confeitaria – início" do %>
+          <%= image_tag "homemade-logo-branco.svg", alt: "Homemade Confeitaria", class: "marca-logo" %>
+        <% end %>
+        <% if logged_in? %>
+          <nav class="menu-topo" aria-label="Menu principal">
+            <%= item_menu "Início", root_path, "painel", :inicio %>
+            <%= item_menu "Pedidos", pedidos_path(periodo: "proximos"), "pedidos", :pedidos %>
+            <%= item_menu "Produção", producao_path, "producao", :producao %>
+            <%= item_menu "Dashboard", dashboard_path, "dashboard", :grafico %>
+            <%= item_menu "Agenda", agendas_path, "agendas", :agenda %>
+            <%= item_menu "Clientes", clientes_path, "clientes", :clientes %>
+            <%= item_menu "Produtos", produtos_path, "produtos", :produtos %>
+            <%= item_menu "Mais", mais_path, "mais_topo", :mais %>
+          </nav>
+          <%= button_to sessions_path, method: :delete, class: "botao-sair", form: { class: "form-inline" }, "aria-label": "Sair do sistema" do %>
+            <%= icone(:sair) %><span>Sair</span>
+          <% end %>
+        <% end %>
+      </div>
+    </header>
+
+    <main class="conteudo">
+      <% if notice.present? %><p class="aviso aviso-ok" role="status"><%= notice %></p><% end %>
+      <% if alert.present? %><p class="aviso aviso-erro" role="alert"><%= alert %></p><% end %>
+      <%= yield %>
+    </main>
+
+    <footer class="rodape">
+      Homemade Confeitaria · Arapiraca – AL
+    </footer>
+
+    <% if logged_in? %>
+      <nav class="menu-baixo" aria-label="Menu principal">
+        <%= item_menu "Início", root_path, "painel", :inicio, classe: "aba" %>
+        <%= item_menu "Pedidos", pedidos_path(periodo: "proximos"), "pedidos", :pedidos, classe: "aba" %>
+        <%= item_menu "Produção", producao_path, "producao", :producao, classe: "aba" %>
+        <%= item_menu "Clientes", clientes_path, "clientes", :clientes, classe: "aba" %>
+        <%= item_menu "Mais", mais_path, "mais", :mais, classe: "aba" %>
+      </nav>
+    <% end %>
+  </body>
+</html>

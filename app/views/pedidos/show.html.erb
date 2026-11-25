@@ -1,0 +1,74 @@
+<% content_for :title, "Pedido #{@pedido.numero}" %>
+<div class="cabecalho">
+  <h1>Pedido <%= @pedido.numero %></h1>
+  <div class="item-acoes">
+    <%= link_to "Editar", edit_pedido_path(@pedido), class: "botao" %>
+    <%= botao_excluir @pedido, pergunta: "Excluir o pedido #{@pedido.numero}?" %>
+  </div>
+</div>
+
+<div class="selos selos-grandes"><%= selo_status(@pedido) %><%= selo_entrega(@pedido) %><%= selo_pagamento(@pedido) %></div>
+
+<section class="cartao etapas" aria-label="Etapa do pedido">
+  <p class="discreto">Mudar etapa:</p>
+  <div class="etapas-botoes">
+    <% @pedido.proximos_status.each do |st| %>
+      <%= button_to Pedido::STATUS[st], status_pedido_path(@pedido, status: st), method: :patch,
+                    class: "botao #{'botao-principal' if st == @pedido.proximos_status.first && st != 'cancelado'} #{'botao-perigo' if st == 'cancelado'}",
+                    form: { class: "form-inline", onsubmit: (st == "cancelado" ? "return confirm('Cancelar este pedido?');" : nil) } %>
+    <% end %>
+    <%= button_to (@pedido.pago? ? "Voltar para a receber" : "Marcar como pago"), pagamento_pedido_path(@pedido), method: :patch, class: "botao", form: { class: "form-inline" } %>
+  </div>
+</section>
+
+<div class="colunas">
+  <section class="cartao bloco">
+    <h2 class="bloco-titulo">Cliente</h2>
+    <dl class="detalhes">
+      <dt>Nome</dt>
+      <dd><%= @pedido.cliente ? link_to(@pedido.nome_cliente, @pedido.cliente) : @pedido.nome_cliente %></dd>
+      <dt>WhatsApp</dt>
+      <dd><%= @pedido.whatsapp_formatado.presence || "—" %></dd>
+      <dt>Quando</dt>
+      <dd><%= dia_da_semana(@pedido.data) %><%= " às #{hora_br(@pedido.horario)}" if @pedido.horario %></dd>
+      <dt><%= @pedido.tipo_entrega_nome %></dt>
+      <dd class="texto-longo"><%= @pedido.entrega? ? @pedido.endereco_entrega : "Cliente busca na loja" %></dd>
+      <dt>Pagamento</dt>
+      <dd><%= @pedido.pago? ? "Pago" : "A receber" %><%= " · #{@pedido.forma_pagamento_nome}" if @pedido.forma_pagamento.present? %></dd>
+    </dl>
+    <% if (url = whatsapp_pedido_url(@pedido)) %>
+      <%= link_to url, class: "botao botao-whatsapp", target: "_blank", rel: "noopener" do %><%= icone(:whatsapp) %>&nbsp;Enviar resumo no WhatsApp<% end %>
+    <% end %>
+  </section>
+
+  <section class="cartao bloco">
+    <h2 class="bloco-titulo">Itens</h2>
+    <% if @pedido.itens.any? %>
+      <table class="tabela-itens">
+        <tbody>
+          <% @pedido.itens.each do |item| %>
+            <tr>
+              <td class="num"><strong><%= item.quantidade %>×</strong></td>
+              <td><%= item.nome %><% if item.observacao.present? %><br><small class="discreto"><%= item.observacao %></small><% end %></td>
+              <td class="num"><%= reais(item.subtotal) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot>
+          <tr><td></td><td>Subtotal</td><td class="num"><%= reais(@pedido.subtotal) %></td></tr>
+          <% if @pedido.taxa_entrega.positive? %><tr><td></td><td>Taxa de entrega</td><td class="num"><%= reais(@pedido.taxa_entrega) %></td></tr><% end %>
+          <% if @pedido.desconto.positive? %><tr><td></td><td>Desconto</td><td class="num">− <%= reais(@pedido.desconto) %></td></tr><% end %>
+          <tr class="linha-total"><td></td><td>Total</td><td class="num"><%= reais(@pedido.total) %></td></tr>
+        </tfoot>
+      </table>
+    <% else %>
+      <p class="discreto">Sem itens cadastrados. Total: <strong><%= reais(@pedido.total) %></strong></p>
+    <% end %>
+    <% if @pedido.descricao.present? %>
+      <h3 class="subtitulo">Descrição</h3>
+      <p class="texto-longo"><%= @pedido.descricao %></p>
+    <% end %>
+  </section>
+</div>
+
+<p><%= link_to "← Voltar para os pedidos", pedidos_path(periodo: "dia", dia: @pedido.data) %></p>

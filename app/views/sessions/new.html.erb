@@ -1,0 +1,16 @@
+<% content_for :title, "Entrar" %>
+<section class="cartao cartao-login">
+  <%= image_tag "homemade-logo-terracota.svg", alt: "Homemade Confeitaria", class: "login-logo" %>
+  <h1 class="visualmente-oculto">Entrar</h1>
+  <%= form_with url: sessions_path, local: true, class: "formulario" do |form| %>
+    <div class="campo">
+      <%= form.label :email, "E-mail" %>
+      <%= form.email_field :email, value: params[:email], autocomplete: "username", required: true, autofocus: true %>
+    </div>
+    <div class="campo">
+      <%= form.label :password, "Senha" %>
+      <%= form.password_field :password, autocomplete: "current-password", required: true %>
+    </div>
+    <%= form.submit "Entrar", class: "botao botao-principal botao-largo" %>
+  <% end %>
+</section>

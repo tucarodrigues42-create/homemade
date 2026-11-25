@@ -1,0 +1,179 @@
+<% content_for :title, "Dashboard" %>
+<%= render "shared/cabecalho", titulo: "Faturamento" %>
+<p class="discreto aviso-faturamento">Pela data de entrega ou retirada dos pedidos. Pedidos cancelados não entram.</p>
+
+<section class="numeros" aria-label="Faturamento">
+  <div class="numero numero-destaque">
+    <span class="numero-rotulo"><%= icone(:grafico) %> Este mês</span>
+    <strong class="numero-valor numero-valor-dinheiro"><%= reais(@mes.total) %></strong>
+    <span class="numero-detalhe">
+      <% if (v = variacao_percentual(@mes.total, @mes_passado.total)) %>
+        <%= v.positive? ? "▲" : (v.negative? ? "▼" : "=") %> <%= v.abs %>% sobre <%= l(@hoje.beginning_of_month << 1, format: "%B") %>
+      <% else %>
+        <%= pluralize(@mes.pedidos, "pedido", plural: "pedidos") %>
+      <% end %>
+    </span>
+  </div>
+  <div class="numero">
+    <span class="numero-rotulo">Hoje</span>
+    <strong class="numero-valor numero-valor-dinheiro"><%= reais(@dia.total) %></strong>
+    <span class="numero-detalhe"><%= pluralize(@dia.pedidos, "pedido", plural: "pedidos") %></span>
+  </div>
+  <div class="numero">
+    <span class="numero-rotulo">Esta semana</span>
+    <strong class="numero-valor numero-valor-dinheiro"><%= reais(@semana.total) %></strong>
+    <span class="numero-detalhe"><%= pluralize(@semana.pedidos, "pedido", plural: "pedidos") %></span>
+  </div>
+  <div class="numero">
+    <span class="numero-rotulo">Ticket médio do mês</span>
+    <strong class="numero-valor numero-valor-dinheiro"><%= reais(@mes.ticket_medio) %></strong>
+    <span class="numero-detalhe">por pedido</span>
+  </div>
+</section>
+
+<section class="cartao recebimento" aria-label="Recebido e a receber neste mês">
+  <div class="recebimento-linha">
+    <div><span class="ponto ponto-recebido"></span>Recebido no mês <strong><%= reais(@mes.recebido) %></strong></div>
+    <div><span class="ponto ponto-a-receber"></span>A receber <strong><%= reais(@mes.a_receber) %></strong></div>
+  </div>
+  <% pct = @mes.total.zero? ? 0 : (@mes.recebido / @mes.total * 100).round %>
+  <div class="barra-recebimento" role="img" aria-label="<%= pct %>% do faturamento do mês já foi recebido">
+    <% if @mes.total.positive? %>
+      <span class="barra-recebido" style="width: <%= pct %>%"></span><span class="barra-a-receber" style="width: <%= 100 - pct %>%"></span>
+    <% end %>
+  </div>
+  <p class="discreto"><%= pct %>% já recebido · <%= link_to "Ver pedidos a receber", pedidos_path(periodo: "todos", pagamento: "pendente") %></p>
+</section>
+
+<section class="bloco" aria-labelledby="titulo-grafico">
+  <div class="bloco-cabecalho bloco-cabecalho-grafico">
+    <h2 id="titulo-grafico" class="bloco-titulo">Evolução do faturamento</h2>
+    <nav class="abas-periodo abas-pequenas" aria-label="Agrupar por">
+      <% { "dias" => "Dias", "semanas" => "Semanas", "meses" => "Meses" }.each do |valor, nome| %>
+        <%= link_to nome, dashboard_path(ver: valor), class: ("ativo" if @faturamento.visao == valor), "aria-current": (@faturamento.visao == valor ? "page" : nil) %>
+      <% end %>
+    </nav>
+  </div>
+
+  <% periodos = @faturamento.periodos %>
+  <% resumo = @faturamento.resumo_do_grafico %>
+  <div class="cartao grafico-cartao">
+    <p class="grafico-resumo">
+      <%= Pedidos::Faturamento::VISOES[@faturamento.visao][:nome] %>: <strong><%= reais(resumo.total) %></strong>
+      em <%= pluralize(resumo.pedidos, "pedido", plural: "pedidos") %>
+    </p>
+    <div class="legenda" aria-hidden="true">
+      <span><span class="ponto ponto-recebido"></span>Recebido</span>
+      <span><span class="ponto ponto-a-receber"></span>A receber</span>
+    </div>
+    <%
+      largura = 640; altura = 240; esq = 4; dir = 4; topo = 10; base = 26
+      area_l = largura - esq - dir; area_a = altura - topo - base
+      teto = topo_do_eixo(@faturamento.maior_total)
+      passo = area_l.to_f / periodos.size
+      barra = [passo * 0.62, 34].min
+      y = ->(v) { topo + area_a - (v.to_f / teto * area_a) }
+      mostrar_rotulo = ->(i) { periodos.size <= 12 || i.even? || i == periodos.size - 1 }
+    %>
+    <div class="grafico" data-grafico>
+      <svg viewBox="0 0 <%= largura %> <%= altura %>" role="img" aria-labelledby="titulo-grafico" preserveAspectRatio="none" class="grafico-svg">
+        <% [0, 0.5, 1].each do |f| %>
+          <line x1="<%= esq %>" x2="<%= largura - dir %>" y1="<%= y.(teto * f).round(1) %>" y2="<%= y.(teto * f).round(1) %>" class="<%= f.zero? ? 'eixo' : 'grade' %>"/>
+        <% end %>
+        <% periodos.each_with_index do |p, i| %>
+          <%
+            cx = esq + passo * i + passo / 2; x = (cx - barra / 2).round(1)
+            h_rec = p.recebido.to_f / teto * area_a; h_pen = p.a_receber.to_f / teto * area_a
+            gap = (h_rec.positive? && h_pen.positive?) ? 2 : 0
+          %>
+          <g class="grafico-coluna" tabindex="0"
+             data-titulo="<%= p.rotulo_longo %>" data-total="<%= reais(p.total) %>" data-recebido="<%= reais(p.recebido) %>"
+             data-a-receber="<%= reais(p.a_receber) %>" data-pedidos="<%= pluralize(p.pedidos, 'pedido', plural: 'pedidos') %>">
+            <title><%= p.rotulo_longo %>: <%= reais(p.total) %> (recebido <%= reais(p.recebido) %>, a receber <%= reais(p.a_receber) %>)</title>
+            <rect class="alvo" x="<%= (esq + passo * i).round(1) %>" y="<%= topo %>" width="<%= passo.round(1) %>" height="<%= area_a %>"/>
+            <% if h_rec.positive? %>
+              <% r = h_pen.positive? ? 0 : [4, h_rec].min %>
+              <path class="serie-recebido" d="M<%= x %>,<%= (topo + area_a).round(1) %> V<%= (topo + area_a - h_rec + r).round(1) %> q0,-<%= r %> <%= r %>,-<%= r %> H<%= (x + barra - r).round(1) %> q<%= r %>,0 <%= r %>,<%= r %> V<%= (topo + area_a).round(1) %> Z"/>
+            <% end %>
+            <% if h_pen.positive? %>
+              <% y0 = topo + area_a - h_rec - gap; hp = [h_pen - gap, 1].max; r = [4, hp].min %>
+              <path class="serie-a-receber" d="M<%= x %>,<%= y0.round(1) %> V<%= (y0 - hp + r).round(1) %> q0,-<%= r %> <%= r %>,-<%= r %> H<%= (x + barra - r).round(1) %> q<%= r %>,0 <%= r %>,<%= r %> V<%= y0.round(1) %> Z"/>
+            <% end %>
+          </g>
+        <% end %>
+      </svg>
+      <div class="grafico-eixo-y" aria-hidden="true">
+        <% [1, 0.5, 0].each do |f| %><span style="top: <%= (y.(teto * f) / altura * 100).round(2) %>%"><%= reais_curto(teto * f) %></span><% end %>
+      </div>
+      <div class="grafico-eixo-x" aria-hidden="true" style="padding-left: <%= (esq.to_f / largura * 100).round(2) %>%; padding-right: <%= (dir.to_f / largura * 100).round(2) %>%">
+        <% periodos.each_with_index do |p, i| %><span><%= mostrar_rotulo.(i) ? p.rotulo : "" %></span><% end %>
+      </div>
+      <div class="grafico-dica" role="status" hidden></div>
+    </div>
+
+    <details class="tabela-grafico">
+      <summary>Ver em tabela</summary>
+      <table class="tabela-itens">
+        <thead><tr><th scope="col">Período</th><th scope="col" class="num">Recebido</th><th scope="col" class="num">A receber</th><th scope="col" class="num">Total</th></tr></thead>
+        <tbody>
+          <% periodos.reverse_each do |p| %>
+            <tr><td><%= p.rotulo_longo %></td><td class="num"><%= reais(p.recebido) %></td><td class="num"><%= reais(p.a_receber) %></td><td class="num"><strong><%= reais(p.total) %></strong></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </details>
+  </div>
+</section>
+
+<section class="bloco" aria-labelledby="titulo-mais-vendidos">
+  <h2 id="titulo-mais-vendidos" class="bloco-titulo">Produtos que mais vendem <small class="discreto">· <%= Pedidos::Faturamento::VISOES[@faturamento.visao][:nome].downcase %></small></h2>
+  <% if @mais_vendidos.empty? %>
+    <div class="vazio vazio-pequeno"><p>Ainda não há itens vendidos neste período.</p></div>
+  <% else %>
+    <% maior = @mais_vendidos.map(&:quantidade).max.to_f %>
+    <ol class="ranking">
+      <% @mais_vendidos.each_with_index do |p, i| %>
+        <li>
+          <span class="ranking-posicao"><%= i + 1 %></span>
+          <div class="ranking-corpo">
+            <div class="ranking-topo"><span class="ranking-nome"><%= p.nome %></span><span class="ranking-valor"><strong><%= p.quantidade %></strong> un. · <%= reais(p.valor) %></span></div>
+            <div class="ranking-trilho"><span style="width: <%= (p.quantidade / maior * 100).round(1) %>%"></span></div>
+          </div>
+        </li>
+      <% end %>
+    </ol>
+  <% end %>
+</section>
+
+<script>
+  (function () {
+    var grafico = document.querySelector("[data-grafico]");
+    if (!grafico) return;
+    var dica = grafico.querySelector(".grafico-dica");
+    function mostrar(col) {
+      var d = col.dataset;
+      dica.innerHTML = "<strong></strong><span></span><span></span><span></span>";
+      var partes = dica.children;
+      partes[0].textContent = d.titulo + " · " + d.total;
+      partes[1].textContent = "Recebido: " + d.recebido;
+      partes[2].textContent = "A receber: " + d.aReceber;
+      partes[3].textContent = d.pedidos;
+      dica.hidden = false;
+      var caixa = grafico.getBoundingClientRect(), alvo = col.getBoundingClientRect();
+      var x = alvo.left + alvo.width / 2 - caixa.left;
+      dica.style.left = Math.min(Math.max(x, 110), caixa.width - 110) + "px";
+      grafico.querySelectorAll(".grafico-coluna").forEach(function (c) { c.classList.toggle("apagada", c !== col); });
+    }
+    function esconder() {
+      dica.hidden = true;
+      grafico.querySelectorAll(".grafico-coluna").forEach(function (c) { c.classList.remove("apagada"); });
+    }
+    grafico.querySelectorAll(".grafico-coluna").forEach(function (col) {
+      col.addEventListener("mouseenter", function () { mostrar(col); });
+      col.addEventListener("focus", function () { mostrar(col); });
+      col.addEventListener("click", function () { mostrar(col); });
+    });
+    grafico.addEventListener("mouseleave", esconder);
+    grafico.addEventListener("focusout", function (e) { if (!grafico.contains(e.relatedTarget)) esconder(); });
+  })();
+</script>
