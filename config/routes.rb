@@ -9,7 +9,16 @@ Rails.application.routes.draw do
       patch :status
       patch :pagamento
     end
+    resources :fotos, only: %i[create show destroy], controller: "pedido_fotos"
   end
+
+  # Backup: planilhas (CSV) e cópia completa para guardar ou restaurar
+  get  "/backup", to: "backups#index", as: :backup
+  get  "/backup/clientes", to: "backups#clientes", as: :backup_clientes
+  get  "/backup/pedidos", to: "backups#pedidos", as: :backup_pedidos
+  get  "/backup/itens", to: "backups#itens", as: :backup_itens
+  get  "/backup/completo", to: "backups#completo", as: :backup_completo
+  post "/backup/restaurar", to: "backups#restaurar", as: :backup_restaurar
   resources :agendas
   resources :clientes
   resources :enderecos

@@ -1,4 +1,4 @@
-<%= form_with model: pedido, local: true, class: "formulario cartao", id: "form-pedido" do |form| %>
+<%= form_with model: pedido, local: true, multipart: true, class: "formulario cartao", id: "form-pedido" do |form| %>
   <%= render "shared/erros", registro: pedido %>
 
   <fieldset class="grupo">
@@ -60,6 +60,17 @@
     <div class="campo">
       <%= form.label :descricao %>
       <%= form.text_area :descricao, rows: 5, placeholder: "Detalhes: sabores, recheios, tamanho, decoração, frase no bolo, alergias…" %>
+    </div>
+    <div class="campo">
+      <span class="rotulo">Fotos de referência <small class="discreto">(opcional)</small></span>
+      <% if pedido.persisted? && pedido.fotos_count.positive? %>
+        <p class="discreto">Este pedido já tem <%= pluralize(pedido.fotos_count, "foto", plural: "fotos") %>. As novas serão somadas a elas.</p>
+      <% end %>
+      <label class="botao botao-foto">
+        <%= icone(:camera) %>&nbsp;<span>Tirar foto ou escolher da galeria</span>
+        <%= form.file_field :novas_fotos, multiple: true, accept: "image/*", class: "visualmente-oculto", data: { "fotos-campo": true } %>
+      </label>
+      <div class="fotos-previa" data-fotos-previa hidden></div>
     </div>
   </fieldset>
 

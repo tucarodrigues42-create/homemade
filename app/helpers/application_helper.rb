@@ -38,6 +38,12 @@ module ApplicationHelper
     pedidos: '<path d="M6 3h12l1 4H5z"/><path d="M5 7h14v12.5A1.5 1.5 0 0 1 17.5 21h-11A1.5 1.5 0 0 1 5 19.5z"/><path d="M9 11h6M9 15h4"/>',
     producao: '<path d="M6 13.5a6 6 0 0 1 12 0"/><path d="M3 13.5h18M5 17h14l-1 4H6z"/><path d="M12 4v3.5M8.5 5.5l1 2.5M15.5 5.5l-1 2.5"/>',
     grafico: '<path d="M4 20V4M4 20h16"/><path d="M8 16v-5M12 16V8M16 16v-3M20 16V6"/>',
+    backup: '<path d="M12 3v12M7.5 10.5 12 15l4.5-4.5"/><path d="M4 15v3.5A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5V15"/>',
+    baixar: '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14"/>',
+    planilha: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/>',
+    restaurar: '<path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"/><path d="M4 3.5v5h5"/>',
+    camera: '<path d="M4 8h3l1.5-2.5h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/>',
+    check: '<path d="M5 12.5 10 17.5 19 7"/>',
     whatsapp: '<path d="M4 20l1.3-3.9A8 8 0 1 1 8 18.9z"/><path d="M9 9.5c.3 2 2.5 4.3 4.6 4.8l1.2-1.2 2 .9c-.2 1-1 1.7-2 1.7-3.6 0-6.8-3.2-6.8-6.8 0-1 .7-1.8 1.7-2l.9 2z"/>'
   }.freeze
 
@@ -56,14 +62,14 @@ module ApplicationHelper
     end
   end
 
-  SECOES_MAIS = %w[dashboard agendas produtos enderecos ingredientes usuarios].freeze
+  SECOES_MAIS = %w[dashboard agendas produtos enderecos ingredientes usuarios backups].freeze
 
   def menu_ativo?(chave)
     case chave
     when "painel" then controller_name == "painel" && action_name == "index"
     when "pedidos" then controller_name == "pedidos" && action_name != "producao"
     when "producao" then controller_name == "pedidos" && action_name == "producao"
-    when "mais_topo" then (controller_name == "painel" && action_name == "mais") || %w[enderecos ingredientes usuarios].include?(controller_name)
+    when "mais_topo" then (controller_name == "painel" && action_name == "mais") || %w[enderecos ingredientes usuarios backups].include?(controller_name)
     when "mais" then (controller_name == "painel" && action_name == "mais") || SECOES_MAIS.include?(controller_name)
     else controller_name == chave
     end
@@ -73,6 +79,28 @@ module ApplicationHelper
     ativo = menu_ativo?(chave)
     link_to caminho, class: [classe, ("ativo" if ativo)].compact.join(" "), "aria-current": (ativo ? "page" : nil) do
       safe_join([icone(icone_nome), tag.span(texto)])
+    end
+  end
+
+  # Barrinha com as 5 etapas do pedido (novo → entregue).
+  def progresso_status(pedido)
+    return tag.span("Cancelado", class: "selo selo-cancelado") if pedido.cancelado?
+    passos = Pedido::FLUXO.each_with_index.map do |st, i|
+      estado = if i + 1 < pedido.passo then "feito" elsif i + 1 == pedido.passo then "atual" end
+      tag.span("", class: ["progresso-passo", estado].compact.join(" "), title: Pedido::STATUS[st])
+    end
+    tag.span(class: "progresso progresso-#{pedido.status}", role: "img",
+             "aria-label": "Etapa #{pedido.passo} de #{Pedido::FLUXO.size}: #{pedido.status_nome}") do
+      safe_join([tag.span(safe_join(passos), class: "progresso-trilho"), tag.span(pedido.status_nome, class: "progresso-nome")])
+    end
+  end
+
+  # Botão grande "próxima etapa", com a cor da etapa para onde o pedido vai.
+  def botao_avancar(pedido, classe: "")
+    return unless (proximo = pedido.proximo_status)
+    button_to status_pedido_path(pedido, status: proximo), method: :patch,
+              class: "botao botao-etapa botao-etapa-#{proximo} #{classe}", form: { class: "form-inline" } do
+      safe_join([icone(:check), tag.span(pedido.acao_proximo)])
     end
   end
 

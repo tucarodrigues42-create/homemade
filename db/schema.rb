@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_11_25_140000) do
+ActiveRecord::Schema[7.2].define(version: 2026_11_25_230000) do
   create_table "agendas", force: :cascade do |t|
     t.text "mensagem"
     t.datetime "created_at", null: false
@@ -55,6 +55,17 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_25_140000) do
     t.index ["produto_id"], name: "index_ingredientes_on_produto_id"
   end
 
+  create_table "pedido_fotos", force: :cascade do |t|
+    t.integer "pedido_id", null: false
+    t.string "nome"
+    t.string "content_type", null: false
+    t.integer "tamanho", default: 0, null: false
+    t.binary "dados", limit: 16777216, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pedido_id"], name: "index_pedido_fotos_on_pedido_id"
+  end
+
   create_table "pedido_itens", force: :cascade do |t|
     t.integer "pedido_id", null: false
     t.integer "produto_id"
@@ -85,6 +96,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_25_140000) do
     t.text "descricao"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "fotos_count", default: 0, null: false
     t.index ["cliente_id"], name: "index_pedidos_on_cliente_id"
     t.index ["data"], name: "index_pedidos_on_data"
     t.index ["status"], name: "index_pedidos_on_status"
@@ -111,6 +123,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_25_140000) do
 
   add_foreign_key "clientes", "enderecos"
   add_foreign_key "ingredientes", "produtos"
+  add_foreign_key "pedido_fotos", "pedidos", on_delete: :cascade
   add_foreign_key "pedido_itens", "pedidos", on_delete: :cascade
   add_foreign_key "pedido_itens", "produtos", on_delete: :nullify
   add_foreign_key "pedidos", "clientes", on_delete: :nullify

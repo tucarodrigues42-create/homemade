@@ -89,10 +89,62 @@ class PedidosControllerTest < ActionDispatch::IntegrationTest
     assert_equal "em_producao", pedidos(:maria_hoje).reload.status
   end
 
-  test "não pula etapa inválida" do
-    patch status_pedido_url(pedidos(:maria_hoje), status: "entregue")
+  test "recusa etapa inválida" do
+    patch status_pedido_url(pedidos(:maria_hoje), status: "inventada")
     assert_equal "novo", pedidos(:maria_hoje).reload.status
     assert flash[:alert].present?
+  end
+
+  test "oferece desfazer depois de mudar a etapa" do
+    pedido = pedidos(:maria_hoje)
+    patch status_pedido_url(pedido, status: "confirmado"), headers: { "HTTP_REFERER" => pedidos_url }
+    follow_redirect!
+    assert_select ".aviso-desfazer", "Desfazer"
+    assert_select "form[action=?]", status_pedido_path(pedido, status: "novo")
+  end
+
+  test "cartão mostra o botão da próxima etapa e o de pagamento" do
+    get pedidos_url(periodo: "dia", dia: Date.current)
+    assert_select ".botao-etapa", text: /Confirmar pedido/
+    assert_select ".botao-pagar", minimum: 1
+  end
+
+  test "tela do pedido mostra as 5 etapas" do
+    get pedido_url(pedidos(:maria_hoje))
+    assert_select ".linha-etapa", 5
+    assert_select ".linha-etapa-atual", 1
+    assert_select ".segmento", 2
+  end
+
+  test "define o pagamento direto" do
+    patch pagamento_pedido_url(pedidos(:maria_hoje), valor: "pago")
+    patch pagamento_pedido_url(pedidos(:maria_hoje), valor: "pago")
+    assert pedidos(:maria_hoje).reload.pago?
+  end
+
+  test "anexa, mostra e apaga fotos" do
+    pedido = pedidos(:maria_hoje)
+    foto = fixture_file_upload("bolo.png", "image/png")
+    assert_difference("PedidoFoto.count", 1) do
+      post pedido_fotos_url(pedido), params: { fotos: [foto] }
+    end
+    assert_redirected_to pedido_url(pedido)
+    nova = pedido.fotos.last
+    get pedido_foto_url(pedido, nova)
+    assert_equal "image/png", response.media_type
+    assert_equal File.binread(file_fixture("bolo.png")), response.body
+    get pedido_url(pedido)
+    assert_select ".galeria-item", 1
+    assert_difference("PedidoFoto.count", -1) { delete pedido_foto_url(pedido, nova) }
+    assert_equal 0, pedido.reload.fotos_count
+  end
+
+  test "salva fotos junto com o pedido novo" do
+    assert_difference("PedidoFoto.count", 1) do
+      post pedidos_url, params: { pedido: { nome_cliente: "Rita", data: Date.current, descricao: "Bolo da foto",
+                                            novas_fotos: [fixture_file_upload("bolo.png", "image/png")] } }
+    end
+    assert_equal 1, Pedido.last.fotos_count
   end
 
   test "marca como pago e volta" do

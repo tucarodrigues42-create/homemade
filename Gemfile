@@ -44,3 +44,6 @@ group :test do
 end
 
 gem "turbo-rails", "~> 2.0"
+
+# Planilhas (CSV) de clientes e pedidos
+gem "csv"

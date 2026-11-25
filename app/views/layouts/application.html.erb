@@ -20,6 +20,7 @@
     <meta name="turbo-refresh-scroll" content="preserve">
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "turbo.min", type: "module", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "fotos", defer: true, "data-turbo-track": "reload" %>
   </head>
 
   <body class="<%= "com-menu" if logged_in? %>">
@@ -47,7 +48,15 @@
     </header>
 
     <main class="conteudo">
-      <% if notice.present? %><p class="aviso aviso-ok" role="status"><%= notice %></p><% end %>
+      <% if notice.present? %>
+        <div class="aviso aviso-ok aviso-flutuante" role="status">
+          <span><%= notice %></span>
+          <% if (desfazer = flash[:desfazer]).is_a?(Hash) && Pedido::STATUS.key?(desfazer["status"]) %>
+            <%= button_to "Desfazer", status_pedido_path(desfazer["pedido_id"], status: desfazer["status"]), method: :patch,
+                          class: "aviso-desfazer", form: { class: "form-inline" } %>
+          <% end %>
+        </div>
+      <% end %>
       <% if alert.present? %><p class="aviso aviso-erro" role="alert"><%= alert %></p><% end %>
       <%= yield %>
     </main>

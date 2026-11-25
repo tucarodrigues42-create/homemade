@@ -5,12 +5,12 @@ class ClientesController < ApplicationController
     @busca = params[:busca].to_s.strip
     @clientes = Cliente.includes(:endereco).em_ordem
     if @busca.present?
-      termo = "%#{Cliente.sanitize_sql_like(@busca)}%"
+      termo = "%#{Cliente.sanitize_sql_like(@busca.downcase)}%"
       digitos = @busca.gsub(/\D/, "")
       @clientes = if digitos.length >= 4
-        @clientes.where("nome LIKE :t OR celular LIKE :d OR telefone LIKE :d", t: termo, d: "%#{digitos}%")
+        @clientes.where("LOWER(nome) LIKE :t OR celular LIKE :d OR telefone LIKE :d", t: termo, d: "%#{digitos}%")
       else
-        @clientes.where("nome LIKE :t", t: termo)
+        @clientes.where("LOWER(nome) LIKE :t", t: termo)
       end
     end
   end

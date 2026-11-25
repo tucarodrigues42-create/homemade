@@ -7,18 +7,54 @@
   </div>
 </div>
 
-<div class="selos selos-grandes"><%= selo_status(@pedido) %><%= selo_entrega(@pedido) %><%= selo_pagamento(@pedido) %></div>
+<div class="selos selos-grandes"><%= selo_entrega(@pedido) %><%= selo_pagamento(@pedido) %></div>
 
-<section class="cartao etapas" aria-label="Etapa do pedido">
-  <p class="discreto">Mudar etapa:</p>
-  <div class="etapas-botoes">
-    <% @pedido.proximos_status.each do |st| %>
-      <%= button_to Pedido::STATUS[st], status_pedido_path(@pedido, status: st), method: :patch,
-                    class: "botao #{'botao-principal' if st == @pedido.proximos_status.first && st != 'cancelado'} #{'botao-perigo' if st == 'cancelado'}",
-                    form: { class: "form-inline", onsubmit: (st == "cancelado" ? "return confirm('Cancelar este pedido?');" : nil) } %>
-    <% end %>
-    <%= button_to (@pedido.pago? ? "Voltar para a receber" : "Marcar como pago"), pagamento_pedido_path(@pedido), method: :patch, class: "botao", form: { class: "form-inline" } %>
+<section class="cartao etapas etapas-<%= @pedido.status %>" aria-labelledby="titulo-etapa">
+  <div class="etapas-topo">
+    <h2 id="titulo-etapa" class="bloco-titulo">Etapa do pedido</h2>
+    <span class="selo selo-<%= @pedido.status %>"><%= @pedido.status_nome %></span>
   </div>
+
+  <% if @pedido.cancelado? %>
+    <p class="discreto">Este pedido foi cancelado e não entra na produção nem no faturamento.</p>
+    <%= button_to "Reabrir pedido", status_pedido_path(@pedido, status: "novo"), method: :patch, class: "botao botao-largo" %>
+  <% else %>
+    <ol class="linha-etapas">
+      <% Pedido::FLUXO.each_with_index do |st, i| %>
+        <% estado = if i + 1 < @pedido.passo then "feito" elsif i + 1 == @pedido.passo then "atual" else "depois" end %>
+        <li class="linha-etapa linha-etapa-<%= estado %> linha-etapa-<%= st %>">
+          <%= button_to status_pedido_path(@pedido, status: st), method: :patch, class: "linha-etapa-botao", disabled: estado == "atual",
+                        form: { class: "form-bloco" }, "aria-current": (estado == "atual" ? "step" : nil),
+                        "aria-label": "Mudar para #{Pedido::STATUS[st]}" do %>
+            <span class="linha-etapa-bolinha"><%= estado == "feito" ? icone(:check) : i + 1 %></span>
+            <span class="linha-etapa-nome"><%= st == "entregue" && !@pedido.entrega? ? "Retirado" : Pedido::STATUS[st] %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+    <%= botao_avancar(@pedido, classe: "botao-largo botao-grande") %>
+    <% if @pedido.status == "entregue" %>
+      <p class="tudo-certo">Pedido concluído<%= " e pago" if @pedido.pago? %>.</p>
+    <% end %>
+    <p class="discreto dica">Tocou errado? Toque na etapa certa na linha acima.</p>
+  <% end %>
+
+  <div class="pagamento-escolha" role="group" aria-label="Pagamento">
+    <span class="pagamento-rotulo">Pagamento</span>
+    <div class="segmentos">
+      <%= button_to "A receber", pagamento_pedido_path(@pedido, valor: "pendente"), method: :patch,
+                    class: "segmento #{'segmento-ativo segmento-pendente' unless @pedido.pago?}", disabled: !@pedido.pago?, form: { class: "form-bloco" } %>
+      <%= button_to pagamento_pedido_path(@pedido, valor: "pago"), method: :patch,
+                    class: "segmento #{'segmento-ativo segmento-pago' if @pedido.pago?}", disabled: @pedido.pago?, form: { class: "form-bloco" } do %>
+        <%= icone(:check) if @pedido.pago? %> Pago
+      <% end %>
+    </div>
+  </div>
+
+  <% unless @pedido.cancelado? %>
+    <%= button_to "Cancelar pedido", status_pedido_path(@pedido, status: "cancelado"), method: :patch,
+                  class: "link-perigo", form: { class: "form-bloco etapas-cancelar", onsubmit: "return confirm('Cancelar este pedido? Ele sai da produção do dia.');" } %>
+  <% end %>
 </section>
 
 <div class="colunas">
@@ -68,6 +104,7 @@
       <h3 class="subtitulo">Descrição</h3>
       <p class="texto-longo"><%= @pedido.descricao %></p>
     <% end %>
+    <%= render "pedidos/fotos", pedido: @pedido, fotos: @fotos %>
   </section>
 </div>
 

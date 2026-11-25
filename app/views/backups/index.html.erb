@@ -1,0 +1,72 @@
+<% content_for :title, "Backup" %>
+<%= render "shared/cabecalho", titulo: "Backup e planilhas" %>
+
+<p class="discreto introducao">
+  Baixe seus dados para guardar no celular, no computador ou no Google Drive.
+  Hoje o sistema tem <strong><%= pluralize(@totais[:clientes], "cliente", plural: "clientes") %></strong>
+  e <strong><%= pluralize(@totais[:pedidos], "pedido", plural: "pedidos") %></strong>.
+</p>
+
+<section class="cartao bloco backup-cartao" aria-labelledby="titulo-completo">
+  <div class="backup-cabeca">
+    <span class="backup-icone"><%= icone(:backup) %></span>
+    <div>
+      <h2 id="titulo-completo" class="bloco-titulo">Cópia completa (backup)</h2>
+      <p class="discreto">Tudo num arquivo só: clientes, endereços, pedidos com itens, produtos, ingredientes e agenda. Use para restaurar se algo der errado.</p>
+    </div>
+  </div>
+  <%= link_to backup_completo_path, class: "botao botao-principal botao-largo", data: { turbo: false } do %><%= icone(:baixar) %>&nbsp;Baixar backup completo<% end %>
+  <p class="discreto dica">Dica: faça um backup no fim de cada dia de trabalho. As fotos dos pedidos não vão no arquivo (ficariam pesadas demais), mas continuam guardadas no sistema.</p>
+</section>
+
+<section class="cartao bloco backup-cartao" aria-labelledby="titulo-planilhas">
+  <div class="backup-cabeca">
+    <span class="backup-icone"><%= icone(:planilha) %></span>
+    <div>
+      <h2 id="titulo-planilhas" class="bloco-titulo">Planilhas (CSV)</h2>
+      <p class="discreto">Abrem no Excel, no Google Planilhas e no Numbers.</p>
+    </div>
+  </div>
+
+  <div class="backup-botoes">
+    <%= link_to backup_clientes_path, class: "botao", data: { turbo: false } do %><%= icone(:clientes) %>&nbsp;Clientes<% end %>
+    <%= link_to backup_pedidos_path, class: "botao", data: { turbo: false } do %><%= icone(:pedidos) %>&nbsp;Todos os pedidos<% end %>
+    <%= link_to backup_itens_path, class: "botao", data: { turbo: false } do %><%= icone(:producao) %>&nbsp;Itens dos pedidos<% end %>
+  </div>
+
+  <details class="backup-periodo">
+    <summary>Baixar só os pedidos de um período</summary>
+    <%= form_with url: backup_pedidos_path, method: :get, local: true, data: { turbo: false }, class: "formulario", id: "form-periodo" do |f| %>
+      <div class="linha">
+        <div class="campo"><%= f.label :de, "De" %><%= f.date_field :de, value: Date.current.beginning_of_month %></div>
+        <div class="campo"><%= f.label :ate, "Até" %><%= f.date_field :ate, value: Date.current.end_of_month %></div>
+      </div>
+      <div class="backup-botoes">
+        <%= f.submit "Pedidos do período", class: "botao botao-principal", name: nil %>
+        <button type="submit" class="botao" formaction="<%= backup_itens_path %>">Itens do período</button>
+      </div>
+    <% end %>
+  </details>
+</section>
+
+<section class="cartao bloco backup-cartao" aria-labelledby="titulo-restaurar">
+  <div class="backup-cabeca">
+    <span class="backup-icone backup-icone-alerta"><%= icone(:restaurar) %></span>
+    <div>
+      <h2 id="titulo-restaurar" class="bloco-titulo">Restaurar um backup</h2>
+      <p class="discreto">Escolha um arquivo <strong>.json</strong> baixado aqui. Nada é apagado: o que estiver no arquivo volta para o sistema (e o que tiver o mesmo número é atualizado com a versão do arquivo). Pedidos criados depois do backup continuam como estão.</p>
+    </div>
+  </div>
+  <% if current_user.adm? %>
+    <%= form_with url: backup_restaurar_path, method: :post, multipart: true, local: true, class: "formulario",
+                  data: { turbo: false }, html: { onsubmit: "return confirm('Restaurar este backup agora?');" } do |f| %>
+      <div class="campo">
+        <%= f.label :arquivo, "Arquivo de backup" %>
+        <%= f.file_field :arquivo, accept: ".json,application/json", required: true %>
+      </div>
+      <%= f.submit "Restaurar backup", class: "botao" %>
+    <% end %>
+  <% else %>
+    <p class="aviso aviso-info">Só o administrador pode restaurar um backup.</p>
+  <% end %>
+</section>

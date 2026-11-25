@@ -48,14 +48,45 @@ class PedidoTest < ActiveSupport::TestCase
     assert_equal "82991234567", pedido.whatsapp
   end
 
-  test "respeita as etapas permitidas" do
+  test "muda de etapa, inclusive pulando ou voltando" do
     pedido = pedidos(:maria_hoje)
-    assert_not pedido.mudar_status!("entregue")
+    assert_not pedido.mudar_status!("inventada")
     assert_equal "novo", pedido.reload.status
     assert pedido.mudar_status!("em_producao")
-    assert pedido.mudar_status!("pronto")
+    assert pedido.mudar_status!("confirmado")
     assert pedido.mudar_status!("entregue")
     assert_equal "entregue", pedido.reload.status
+  end
+
+  test "próxima etapa e texto do botão" do
+    pedido = pedidos(:maria_hoje) # entrega, etapa "novo"
+    assert_equal "confirmado", pedido.proximo_status
+    assert_equal "Confirmar pedido", pedido.acao_proximo
+    assert_equal 1, pedido.passo
+    pedido.status = "pronto"
+    assert_equal "Marcar como entregue", pedido.acao_proximo
+    pedido.tipo_entrega = "retirada"
+    assert_equal "Cliente retirou", pedido.acao_proximo
+    pedido.status = "entregue"
+    assert_nil pedido.proximo_status
+    pedido.status = "cancelado"
+    assert_nil pedido.acao_proximo
+  end
+
+  test "anexa fotos ao salvar o pedido" do
+    foto = Rack::Test::UploadedFile.new(file_fixture("bolo.png"), "image/png")
+    pedido = Pedido.new(nome_cliente: "Carla", data: Date.current, descricao: "Bolo igual à foto", novas_fotos: [foto])
+    assert pedido.save
+    assert_equal 1, pedido.fotos.count
+    assert_equal 1, pedido.reload.fotos_count
+    assert_equal File.binread(file_fixture("bolo.png")), pedido.fotos.first.dados
+  end
+
+  test "recusa arquivo que não é foto" do
+    texto = Rack::Test::UploadedFile.new(StringIO.new("oi"), "text/plain", original_filename: "nota.txt")
+    pedido = Pedido.new(nome_cliente: "Carla", data: Date.current, descricao: "x", novas_fotos: [texto])
+    assert_not pedido.save
+    assert_match "nota.txt", pedido.errors.full_messages.to_sentence
   end
 
   test "busca por nome, telefone, item e número" do
