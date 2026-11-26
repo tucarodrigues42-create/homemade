@@ -1,23 +1,27 @@
-<li class="cartao pedido <%= "pedido-cancelado" if pedido.cancelado? %>">
+<li class="cartao pedido pedido-<%= pedido.status %>">
   <div class="pedido-topo">
     <span class="pedido-hora"><%= hora_br(pedido.horario) || "—" %><small><%= l(pedido.data, format: "%d/%m") %></small></span>
     <div class="pedido-quem">
       <%= link_to pedido, class: "pedido-nome" do %><%= pedido.nome_cliente %> <small><%= pedido.numero %></small><% end %>
       <p class="pedido-itens"><%= resumo_itens(pedido).presence || truncate(pedido.descricao, length: 90) %></p>
     </div>
-    <strong class="pedido-total"><%= reais(pedido.total) %></strong>
-  </div>
-  <div class="pedido-rodape">
-    <div class="selos"><%= selo_status(pedido) %><%= selo_entrega(pedido) %><%= selo_pagamento(pedido) %></div>
-    <div class="pedido-acoes">
-      <% proximo = pedido.proximos_status.first %>
-      <% if proximo && !pedido.cancelado? && proximo != "cancelado" %>
-        <%= button_to "→ #{Pedido::STATUS[proximo]}", status_pedido_path(pedido, status: proximo), method: :patch,
-                      class: "botao botao-pequeno", form: { class: "form-inline" } %>
-      <% end %>
-      <% unless pedido.pago? || pedido.cancelado? %>
-        <%= button_to "Marcar pago", pagamento_pedido_path(pedido), method: :patch, class: "botao botao-pequeno", form: { class: "form-inline" } %>
+    <div class="pedido-lado">
+      <strong class="pedido-total"><%= reais(pedido.total) %></strong>
+      <% if pedido.fotos_count.positive? %>
+        <span class="pedido-fotos" title="Fotos anexadas"><%= icone(:camera) %><%= pedido.fotos_count %></span>
       <% end %>
     </div>
+  </div>
+  <div class="pedido-meio">
+    <%= progresso_status(pedido) %>
+    <div class="selos"><%= selo_entrega(pedido) %><%= selo_pagamento(pedido) %></div>
+  </div>
+  <div class="pedido-acoes">
+    <%= render "pedidos/escolher_status", pedido: pedido %>
+    <% unless pedido.pago? || pedido.cancelado? %>
+      <%= button_to pagamento_pedido_path(pedido, valor: "pago"), method: :patch, class: "botao botao-pagar", form: { class: "form-inline" } do %>
+        <span>Marcar pago</span>
+      <% end %>
+    <% end %>
   </div>
 </li>

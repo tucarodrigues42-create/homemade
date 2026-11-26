@@ -14,14 +14,14 @@ class Pedido < ApplicationRecord
     "cancelado" => "Cancelado"
   }.freeze
 
-  # Para onde cada etapa pode ir. Dá para voltar uma etapa, caso alguém toque errado.
-  TRANSICOES = {
-    "novo" => %w[confirmado em_producao cancelado],
-    "confirmado" => %w[em_producao novo cancelado],
-    "em_producao" => %w[pronto confirmado cancelado],
-    "pronto" => %w[entregue em_producao cancelado],
-    "entregue" => %w[pronto],
-    "cancelado" => %w[novo]
+  # Caminho normal do pedido, na ordem. "Cancelado" fica fora da fila.
+  FLUXO = %w[novo confirmado em_producao pronto entregue].freeze
+
+  # Texto do botão grande que leva o pedido para a próxima etapa.
+  ACOES = {
+    "novo" => "Confirmar pedido",
+    "confirmado" => "Começar a produzir",
+    "em_producao" => "Ficou pronto"
   }.freeze
 
   TIPOS_ENTREGA = { "retirada" => "Retirada na loja", "entrega" => "Entrega" }.freeze
@@ -31,10 +31,15 @@ class Pedido < ApplicationRecord
   belongs_to :cliente, optional: true
   has_many :itens, -> { order(:id) }, class_name: "PedidoItem", inverse_of: :pedido, dependent: :destroy
   accepts_nested_attributes_for :itens, allow_destroy: true, reject_if: :item_em_branco?
+  has_many :fotos, -> { order(:id) }, class_name: "PedidoFoto", inverse_of: :pedido, dependent: :delete_all
+
+  # Fotos enviadas pelo formulário (novo pedido ou edição).
+  attr_reader :novas_fotos
 
   before_validation :limpar_whatsapp
   before_validation :preencher_do_cliente
   before_save :calcular_total
+  after_save :salvar_novas_fotos
 
   validates :nome_cliente, presence: true, length: { maximum: 80 }
   validates :data, presence: true
@@ -46,6 +51,7 @@ class Pedido < ApplicationRecord
   validates :taxa_entrega, :desconto, numericality: { greater_than_or_equal_to: 0 }
   validates :endereco_entrega, presence: { message: "é obrigatório para entrega" }, if: :entrega?
   validate :precisa_de_item_ou_descricao
+  validate :fotos_validas
 
   scope :do_dia, ->(dia) { where(data: dia) }
   scope :ativos, -> { where.not(status: "cancelado") }
@@ -71,16 +77,43 @@ class Pedido < ApplicationRecord
   def tipo_entrega_nome = TIPOS_ENTREGA.fetch(tipo_entrega, tipo_entrega)
   def forma_pagamento_nome = FORMAS_PAGAMENTO[forma_pagamento]
 
-  def proximos_status = TRANSICOES.fetch(status, [])
+  def em_aberto? = !%w[entregue cancelado].include?(status)
 
-  # Muda a etapa respeitando a tabela de transições.
+  # Próxima etapa do caminho normal (nil quando já foi entregue ou foi cancelado).
+  def proximo_status
+    return if cancelado?
+    FLUXO[FLUXO.index(status).to_i + 1]
+  end
+
+  def etapa_anterior
+    indice = FLUXO.index(status)
+    FLUXO[indice - 1] if indice&.positive?
+  end
+
+  # Ex.: "Confirmar pedido", "Ficou pronto", "Cliente retirou".
+  def acao_proximo
+    return unless (proximo = proximo_status)
+    return(entrega? ? "Marcar como entregue" : "Cliente retirou") if proximo == "entregue"
+    ACOES.fetch(status, Pedido::STATUS[proximo])
+  end
+
+  # Posição no caminho (1 a 5) para a barrinha de progresso.
+  def passo = FLUXO.index(status).to_i + 1
+
+  # Muda a etapa. Dá para pular etapas (ex.: pedido de balcão já entregue) ou
+  # voltar, caso alguém toque errado.
   def mudar_status!(novo)
     novo = novo.to_s
-    unless proximos_status.include?(novo)
-      errors.add(:status, "não pode ir de #{status_nome} para #{STATUS.fetch(novo, novo)}")
+    unless STATUS.key?(novo)
+      errors.add(:status, "inválida")
       return false
     end
+    return true if novo == status
     update(status: novo)
+  end
+
+  def novas_fotos=(arquivos)
+    @novas_fotos = Array(arquivos).select { |a| a.respond_to?(:read) && a.size.to_i.positive? }
   end
 
   def subtotal
@@ -122,6 +155,25 @@ class Pedido < ApplicationRecord
 
   def calcular_total
     self.total = Pedidos::Calculadora.new(self).total
+  end
+
+  def fotos_preparadas
+    @fotos_preparadas ||= Array(novas_fotos).map { |arquivo| PedidoFoto.do_arquivo(arquivo) }
+  end
+
+  def fotos_validas
+    fotos_preparadas.each do |foto|
+      foto.valid?
+      foto.errors.delete(:pedido)
+      next if foto.errors.empty?
+      errors.add(:base, "Foto \"#{foto.nome}\": #{foto.errors.full_messages.to_sentence}")
+    end
+  end
+
+  def salvar_novas_fotos
+    fotos_preparadas.each { |foto| fotos << foto }
+    @fotos_preparadas = nil
+    @novas_fotos = nil
   end
 
   def precisa_de_item_ou_descricao

@@ -1,0 +1,21 @@
+<%# Botão de etapa: mostra a etapa atual; ao tocar, abre todas as etapas para escolher. %>
+<details class="escolher-status escolher-status-<%= pedido.status %> <%= local_assigns[:classe] %>">
+  <summary class="botao escolher-status-botao" aria-label="Etapa: <%= pedido.status_nome %>. Toque para mudar">
+    <span class="escolher-status-bolinha" aria-hidden="true"></span>
+    <span class="escolher-status-texto"><small>Etapa</small><%= pedido.status_nome %></span>
+    <span class="escolher-status-seta" aria-hidden="true">▾</span>
+  </summary>
+  <div class="escolher-status-opcoes" role="group" aria-label="Escolha a etapa do pedido">
+    <% Pedido::STATUS.each_key do |st| %>
+      <% nome = st == "entregue" && !pedido.entrega? ? "Retirado" : Pedido::STATUS[st] %>
+      <% atual = st == pedido.status %>
+      <%= button_to status_pedido_path(pedido, status: st), method: :patch, disabled: atual,
+                    class: "opcao-status opcao-status-#{st} #{'opcao-status-atual' if atual}",
+                    form: { class: "form-bloco", onsubmit: (st == "cancelado" ? "return confirm('Cancelar este pedido? Ele sai da produção do dia.');" : nil) } do %>
+        <span class="escolher-status-bolinha" aria-hidden="true"></span>
+        <span><%= nome %></span>
+        <% if atual %><%= icone(:check) %><% end %>
+      <% end %>
+    <% end %>
+  </div>
+</details>

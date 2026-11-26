@@ -93,15 +93,17 @@ class PedidosController < ApplicationController
 
   # Avança (ou volta) a etapa do pedido com um toque.
   def status
+    anterior = @pedido.status
     if @pedido.mudar_status!(params[:status])
-      redirect_back fallback_location: @pedido, notice: "Pedido #{@pedido.numero}: #{@pedido.status_nome}."
+      flash[:desfazer] = { "pedido_id" => @pedido.id, "status" => anterior } if anterior != @pedido.status
+      redirect_back fallback_location: @pedido, notice: "#{@pedido.nome_cliente} (#{@pedido.numero}): #{@pedido.status_nome.downcase}."
     else
       redirect_back fallback_location: @pedido, alert: @pedido.errors.full_messages.to_sentence
     end
   end
 
   def pagamento
-    novo = @pedido.pago? ? "pendente" : "pago"
+    novo = Pedido::PAGAMENTOS.key?(params[:valor]) ? params[:valor] : (@pedido.pago? ? "pendente" : "pago")
     @pedido.update_columns(pagamento: novo, updated_at: Time.current)
     redirect_back fallback_location: @pedido,
                   notice: "Pedido #{@pedido.numero} marcado como #{Pedido::PAGAMENTOS[novo].downcase}."
@@ -111,6 +113,7 @@ class PedidosController < ApplicationController
 
   def set_pedido
     @pedido = Pedido.includes(itens: :produto).find(params[:id])
+    @fotos = @pedido.fotos.sem_dados.to_a if action_name == "show"
   end
 
   def carregar_opcoes
@@ -134,7 +137,8 @@ class PedidosController < ApplicationController
     params.require(:pedido).permit(
       :cliente_id, :nome_cliente, :whatsapp, :tipo_entrega, :endereco_entrega, :data, :horario,
       :status, :pagamento, :forma_pagamento, :taxa_entrega, :desconto, :descricao,
-      itens_attributes: %i[id produto_id nome quantidade preco_unitario observacao _destroy]
+      itens_attributes: %i[id produto_id nome quantidade preco_unitario observacao _destroy],
+      novas_fotos: []
     )
   end
 end

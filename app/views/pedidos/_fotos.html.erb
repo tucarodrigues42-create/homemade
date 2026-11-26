@@ -1,0 +1,25 @@
+<div class="fotos-pedido" id="fotos">
+  <h3 class="subtitulo">Fotos <% if fotos.any? %><small class="discreto">(<%= fotos.size %>)</small><% end %></h3>
+  <% if fotos.any? %>
+    <ul class="galeria">
+      <% fotos.each do |foto| %>
+        <li class="galeria-item">
+          <%= link_to pedido_foto_path(pedido, foto), class: "galeria-link", target: "_blank", rel: "noopener", data: { turbo: false } do %>
+            <%= image_tag pedido_foto_path(pedido, foto), alt: "Foto do pedido #{pedido.numero}", loading: "lazy", class: "galeria-imagem" %>
+          <% end %>
+          <%= button_to pedido_foto_path(pedido, foto), method: :delete, class: "galeria-apagar", "aria-label": "Apagar foto",
+                        form: { class: "form-inline", onsubmit: "return confirm('Apagar esta foto?');" } do %>×<% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="discreto">Nenhuma foto. Anexe a referência do bolo, a decoração ou um print da conversa.</p>
+  <% end %>
+  <%= form_with url: pedido_fotos_path(pedido), method: :post, multipart: true, local: true, class: "form-fotos", data: { "fotos-form": true } do |f| %>
+    <label class="botao botao-largo botao-foto">
+      <%= icone(:camera) %>&nbsp;<span>Anexar fotos</span>
+      <%= f.file_field :fotos, multiple: true, accept: "image/*", class: "visualmente-oculto", data: { "fotos-envio": true } %>
+    </label>
+    <noscript><%= f.submit "Enviar fotos", class: "botao" %></noscript>
+  <% end %>
+</div>
